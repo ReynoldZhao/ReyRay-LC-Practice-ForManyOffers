@@ -1,0 +1,67 @@
+import java.util.Arrays;
+import java.util.HashMap;
+import java.lang.Integer;
+import java.lang.Character;
+import java.lang.String;
+import java.lang.Math;
+import java.util.PriorityQueue;
+import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.PriorityQueue;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.lang.StringBuilder;
+
+public class Heap{
+    private:
+        ArrayList<Integer> data;
+    
+    public void insert(Integer m){
+        if(data.size()==0){
+            data.add(m);
+            return ;
+        }
+        int index = data.size()++;
+        while(data[index/2]<m){
+            data[index] = data[index/2];
+            index = index/2;
+        }
+        data[index] = m;
+    }
+
+    public void perdown(int index){
+        if(index>=data.size()||index<0){
+            return;
+        }
+        int parent = index;
+        int value = data[parent];
+        while(parent<data.size()){
+            int child = parent*2;
+            if(child<data.size()-1&&data[child]<data[child+1])
+                child = child + 1;
+            if(value>=data[child]) break;
+            else{
+                data[parent] = data[child];
+            }
+            parent = child;
+        }
+        data[parent] = value;
+    }
+    
+    public void delete(){
+        if(data.size()==0){
+            return;
+        }
+        int max = data[0];
+        data[0] = data[data.size()-1];
+        data.remove(data.size()-1);
+        perdown(0);
+    }
+    public createHeap(int[] arr){
+        data = new ArrayList(arr);
+        for(int i = arr.size()-1;i>0;i--)){
+            perdown(i);
+        }
+        insert
+    }
+}
