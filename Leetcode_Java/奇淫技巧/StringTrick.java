@@ -1,3 +1,10 @@
+class Solution {
+    public String replaceSpaces(String S, int length) {
+        return S.substring(0,length).replace(" ","%20");
+    }
+}
+//字符串替换函数
+
 public String replaceSpace(StringBuffer str) {
     str.length();
     str.charAt(i)
