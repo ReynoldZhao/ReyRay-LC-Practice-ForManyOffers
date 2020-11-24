@@ -85,7 +85,74 @@ class SolutionT0105
 public:
     bool oneEditAway(string first, string second)
     {
-        if (first == second) return true;
-        
+        if (abs(first.size() - second.size()) >= 2) return false;
+        int len1 = first.size(), len2 = second.size();
+        string s1 = first.size() >= second.size() ? first:second;
+        string s2 = first.size() >= second.size() ? second:first;
+        int a = 0, b = 0, dif = 0;
+        while (a < len1 && b < len2) {
+            if (s1[a] != s2[b]) {
+                dif++;
+                if (s1.size() == s2.size()) {
+                    a++; b++;
+                }
+                else {
+                    a++;
+                }
+                a++; b++;
+                if (dif >= 2) break
+            }
+        }
+        return !(dif>=2);
     }
 };
+
+//翻转数组
+//对于矩阵中第 ii 行的第 jj 个元素，在旋转后，它出现在倒数第 ii 列的第 jj 个位置。
+//由于矩阵中的行列从 00 开始计数，
+//matrix[row][col] 翻转之后在matrix[col][n-row-1]
+
+class Solution {
+public:
+    void rotate(vector<vector<int>>& matrix) {
+        int n = matrix.size();
+        // C++ 这里的 = 拷贝是值拷贝，会得到一个新的数组
+        auto matrix_new = matrix;
+        for (int i = 0; i < n; ++i) {
+            for (int j = 0; j < n; ++j) {
+                matrix_new[j][n - i - 1] = matrix[i][j];
+            }
+        }
+        // 这里也是值拷贝
+        matrix = matrix_new;
+    }
+
+    void rotate(vector<vector<int>>& matrix) {
+        int m = matrix.size();
+        for (int i = 0; i <= (m-1)/2; i++) {
+            for (int j = i; j <= m - i - 2; j++) {
+                int temp = matrix[i][j];
+                matrix[i][j] = matrix[m - 1 -j][i];
+                matrix[m-1-j][i] = matrix[m-1-i][m-1-j];
+                matrix[m-1-i][m-1-j] = matrix[j][m-1-i];
+                matrix[j][n - 1 - i] = temp; 
+            }
+        }
+    }
+//首先以从对角线为轴翻转，然后再以x轴中线上下翻转即可得到结果，如下图所示(其中蓝色数字表示翻转轴)：
+    void rotate(vector<vector<int>>& matrix) {
+        int n = matrix.size();
+        for (int i = 0; i < n - 1; ++i) {
+            for (int j = 0; j < n - i; ++j) {
+                swap(matrix[i][j], matrix[n - 1- j][n - 1 - i]);
+            }
+        }
+        reverse(matrix.begin(), matrix.end());
+    }
+};
+
+//在 C++ 中，res += s 和 res = res + s 的含义是不一样的。
+//前者是直接在 res 后面添加字符串；后者是用一个临时对象计算 res + s，会消耗很多时间和内存
+
+//在 Java 中，要使用 StringBuilder，而不能直接用字符串相加。
+//字符串压缩 可以用个双指针
