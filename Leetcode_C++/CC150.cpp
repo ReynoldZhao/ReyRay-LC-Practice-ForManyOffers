@@ -156,3 +156,53 @@ public:
 
 //在 Java 中，要使用 StringBuilder，而不能直接用字符串相加。
 //字符串压缩 可以用个双指针
+
+class SolutionT0203 {
+public:
+    void deleteNode(ListNode* node) {
+        node->val = node->next->val;
+        node->next = node->next->next;
+        //杀不掉你就变成你
+    }
+};
+
+class SolutionT0109 {
+public:
+    bool isFlipedString(string s1, string s2) {
+        return s1.size() == s2.size() && (s2 + s2).find(s1) != string::npos;
+    }
+    //java
+    // if (s1.length()!=s2.length()) return false;
+	//     String ss = s2+s2;
+	//     return ss.contains(s1);    
+    // }
+};
+
+struct ListNode {
+    int val;
+    ListNode *next;
+    ListNode(int x) : val(x), next(NULL) {}
+};
+
+class SolutionT0201 {
+public:
+    ListNode* removeDuplicateNodes(ListNode* head) {
+        ListNode* res = new ListNode(0);
+        ListNode* curhead = head;
+        res->next = head;
+        while(curhead) {
+            ListNode *dumhead = curhead->next, *pre = curhead;
+            while(dumhead) {
+                if (curhead->val == dumhead->val) {
+                    pre->next = pre->next->next;
+                    dumhead = pre->next;
+                } else {
+                    dumhead = dumhead->next;
+                    pre = pre->next;
+                }
+            }
+            curhead = curhead->next;
+        }
+        return res->next;
+    }
+};

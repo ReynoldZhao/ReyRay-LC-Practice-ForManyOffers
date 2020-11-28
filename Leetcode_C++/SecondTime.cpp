@@ -1779,3 +1779,313 @@ public:
         }
     }
 };
+
+class SolutionT650 {
+public:
+    int minSteps(int n) {
+        if (n == 1) return 0;
+        int res = n;
+        for (int i = n - 1; i >= 1; i--) {
+            if (n%i == 0) {
+                res = min(res, minSteps(n/i) + i);
+            }
+        }
+        return res;
+    }
+
+    //dp
+    int minSteps(int n) {
+        vector<int> dp(n + 1, 0);
+        for (int i = 2; i <= n; ++i) {
+            dp[i] = i;
+            for (int j = i - 1; j > 1; --j) {
+                if (i % j == 0) {
+                    dp[i] = min(dp[i], dp[j] + i / j);
+                }
+            }
+        }
+        return dp[n];
+    }
+
+    int minSteps(int n) {
+        vector<int> dp(n+1, 0);
+        int h = sqrt(n);
+        for (int i = 2; i <= n; i++) {
+            dp[i] = i;
+            for (int j = 2; j <= h; j++) {
+                if (i%j == 0) {
+                    dp[i] = dp[j] + dp[i/j];
+                    break;
+                }
+            }
+        }
+        return dp[n];
+    }
+};
+
+class SolutionT188 {
+public:
+    int maxProfit(int k, vector<int>& prices) {
+        int days = prices.size();
+        if (days < 2) return 0;
+        if (k >= days) return maxProfitUnlimited(prices);
+        vector<int> sell(k+1, 0), buy(k+1);
+        for (int i = 0; i < days; i++) {
+            for (int j = 1; j <= k; j++) {
+                buy[j] = max(buy[j], sell[j-1] - prices[i]);
+                sell[j] = max(sell[j], buy[j] + prices[i]);
+            }
+        }
+        return sell[k];
+    }
+
+    int maxProfitUnlimited(vector<int>& prices) {
+        int res = 0;
+        for (int i = 1; i < prices.size()) {
+            if (prices[i] > prices[i-1]) {
+                res += prices[i] - prices[i-1];
+            }
+        }
+        return res;
+    }
+    public int maxProfit(int k, int[] prices) {
+        /**
+        当k大于等于数组长度一半时, 问题退化为贪心问题此时采用 买卖股票的最佳时机 II
+        的贪心方法解决可以大幅提升时间性能, 对于其他的k, 可以采用 买卖股票的最佳时机 III
+        的方法来解决, 在III中定义了两次买入和卖出时最大收益的变量, 在这里就是k租这样的
+        变量, 即问题IV是对问题III的推广, t[i][0]和t[i][1]分别表示第i比交易买入和卖出时
+        各自的最大收益
+        **/
+        if(k < 1) return 0;
+        if(k >= prices.length/2) return greedy(prices);
+        int[][] t = new int[k][2];
+        for(int i = 0; i < k; ++i)
+            t[i][0] = Integer.MIN_VALUE;
+        for(int p : prices) {
+            t[0][0] = Math.max(t[0][0], -p);
+            t[0][1] = Math.max(t[0][1], t[0][0] + p);
+            for(int i = 1; i < k; ++i) {
+                t[i][0] = Math.max(t[i][0], t[i-1][1] - p);
+                t[i][1] = Math.max(t[i][1], t[i][0] + p);
+            }
+        }
+        return t[k-1][1];
+    }
+    
+    private int greedy(int[] prices) {
+        int max = 0;
+        for(int i = 1; i < prices.length; ++i) {
+            if(prices[i] > prices[i-1])
+                max += prices[i] - prices[i-1];
+        }
+        return max;
+    }
+};
+
+class SolutionT309 {
+public:
+    int maxProfit(vector<int>& prices) {
+
+    }
+};
+
+class SolutionT213 {
+public:
+    // dp[1] = max(nums[0], nums[1])
+    int rob(vector<int>& nums) {
+        if (nums.size() <= 0) return 0;
+        if (nums.size() == 1) return nums[0];
+        vector<int> dp(nums.size(), 0);
+        dp[0] = nums[0], dp[1] = max(nums[0], nums[1]);
+        int res = max(dp[0], dp[1]);
+        for (int i = 2; i < nums.size() - 1; i++) {
+            dp[i] = max(dp[i - 1], dp[i - 2] + nums[i]);
+            res = max(res, dp[i]);
+        }
+        vector<int> dp2(nums.size(), 0);
+        dp2[0] = 0, dp2[1] = nums[1];
+        res = max(res, dp2[1]);
+        for (int i = 2; i < nums.size(); i++) {
+            dp2[i] = max(dp2[i - 1], dp2[i - 2] + nums[i]);
+            res = max(res, dp2[i]);
+        }
+        return res;
+    }
+};
+
+class SolutionT424 {
+public:
+    int characterReplacement(string s, int k) {
+        int res = 0, maxCount = 0, start = 0;
+        vector<int> bucket(26, 0);
+        for (int i = 0; i + res <= s.size(); i++) {
+            maxCount = max(maxCount, ++bucket[s[i] - 'A']);
+            while (i - start - maxCount + 1> k) {
+                --counts[s[start] - 'A'];
+                ++start;
+            }
+            res = max(res, i - start + 1);
+        }
+        return res;
+    }
+};
+
+class SolutionT0204 {
+public:
+    ListNode* partition(ListNode* head, int x) {
+        ListNode *p = head, *q = head;
+        while(q) {
+            if (q->val < x) {
+                int temp = q->val;
+                q->val = p->val
+                p->val = temp;
+                p = p->next;
+            }
+            q = q->next;
+        }
+        return head;
+    }
+};
+
+class SolutionT0205 {
+public:
+    ListNode* addTwoNumbers(ListNode* l1, ListNode* l2) {
+        ListNode* temp = l1;
+        int len1 = 0;
+        while(temp) {
+            len1++;
+            temp = temp->next;
+        }
+        temp = l2;
+        while(temp) {
+            len2++;
+            temp = temp->next;
+        }
+        ListNode* List1 = len1 >= len2 ? l1:l2;
+        ListNode* List2 = len1 >= len2 ? l2:l1;
+        int dif = abs(len1 - len2);
+        ListNode* cur = List1;
+        while(dif > 1) {
+            cur = cur->next;
+            dif--;
+        }
+        ListNode* Next = addNode(cur->next, l2);
+        if (Next->val == 0) cur->val;
+    }
+};
+
+class SolutionT343 {
+public:
+    int integerBreak(int n) {
+        vector<int> dp(n+1, 0);
+        dp[0] = 1, dp[1] = 1, dp[2] = 1, dp[3] = 3, dp[4] = 4;
+        if (n <= 4) {
+            dp[3] = 2;
+            return dp[i]
+        }
+        for (int i = 5; i <= n; i++) {
+            for (int j = 1; j < i; j++) {
+                dp[i] = max(dp[j]*(i - j), dp[i]);
+            }
+        }
+        return dp[n];
+    }
+};
+
+class SolutionT300 {
+public:
+    int lengthOfLIS(vector<int>& nums) {
+        if (nums.size() <= 1) return nums.size();
+        vector<int> dp;
+        dp.push_back(nums[0]);
+        for (int i = 1; i < nums.size(); i++) {
+            if (nums[i] > dp.back()) dp.push_back(nums[i]);
+            else {
+                auto itr = lower_bound(dp.begin(), dp.end(), nums[i]);
+                *itr = nums[i];
+            }
+        }
+        return dp.size();
+    }
+};
+
+class SolutionT646 {
+public:
+    //Greedy
+    int findLongestChain(vector<vector<int>>& pairs) {
+        sort(pairs.begin(), pairs.end(), [](vector<int> a, vector<int> b){
+            return a[0] == b[0] ? a[1] <= b[1]:a[0] < b[0];
+        });
+        int res = 1, cur_start = pairs[0][0], cur_end = pairs[0][1];
+        for (int i = 1; i < pairs.size(); i++) {
+            if (pairs[i][0] > cur_end) {
+                res++;
+                cur_start = pairs[i][0];
+                cur_end = pairs[i][1];
+            }
+            else if (pairs[i][0] >= cur_start && pairs[i][1] < cur_end) {
+                cur_start = pairs[i][0];
+                cur_end = pairs[i][1];
+            }
+        }
+        return res;
+    }
+
+    //DP
+
+};
+
+class SolutionT376 {
+public:
+    //[0,0,0]出问题
+    int wiggleMaxLength(vector<int>& nums) {
+        if (nums.size() <= 2) return nums.size();
+        vector<int> dp(nums.size(), 1);
+        int res = 2;
+        dp[0] = 1, dp[1] = nums[1] > nums[0] ? 2:-2;
+        for (int i = 2; i < nums.size(); i++) {
+            for (int j = 0; j < i; j++) {
+                if (nums[i] > nums[j]) {
+                    if (j == 0) {
+                        dp[i] = 2;
+                        continue;
+                    }
+                    if(dp[j] < 0) dp[i] = max(abs(dp[i]), abs(dp[j]) + 1);
+                }
+                else if (nums[i] < nums[j] && dp[j] >0) {
+                    dp[i] = - max(abs(dp[i]), abs(dp[j]) + 1);
+                }
+            }
+            res = max(res, abs(dp[i]));
+        }
+        return res;
+    }
+
+    int abs(int n) {
+        return n < 0 ? -n : n;
+    }
+
+    //gready妙啊！
+    int wiggleMaxLength(vector<int>& nums) {
+        int p = 1, q = 1, n = nums.size();
+        for (int i = 1; i < nums.size(); i++) {
+            if (nums[i] > nums[i-1]) p = q + 1;
+            else if (nums[i] < nums[i-1]) q = p + 1;
+        }
+        return min(n, max(p, q));
+    }
+
+    //两个dp数组解决
+    int wiggleMaxLength(vector<int>& nums) {
+        if (nums.empty()) return 0;
+        vector<int> p(nums.size(), 1);
+        vector<int> q(nums.size(), 1);
+        for (int i = 1; i < nums.size(); ++i) {
+            for (int j = 0; j < i; ++j) {
+                if (nums[i] > nums[j]) p[i] = max(p[i], q[j] + 1);
+                else if (nums[i] < nums[j]) q[i] = max(q[i], p[j] + 1);
+            }
+        }
+        return max(p.back(), q.back());
+    }
+};
