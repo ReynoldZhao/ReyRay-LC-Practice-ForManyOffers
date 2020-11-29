@@ -2089,3 +2089,52 @@ public:
         return max(p.back(), q.back());
     }
 };
+
+class SolutionT494 {
+public:
+    int findTargetSumWays(vector<int>& nums, int S) {
+        int m = nums.size();
+        vector<unordered_map<int, int>> memo(nums.size());
+        return helper(nums, S, 0, dp);
+    }
+
+    //memo[index]{之前是个map}[sum]从最后到index能够成sum的个数
+    int helper(vector<int>& nums, int sum, int index,  vector<unordered_map<int, int>> &memo) {
+        if (index >= nums.size()) return sum == 0;
+        if (memo[index].count(sum)) return memo[index][sum];
+        int cnt1 = helper(nums, sum - nums[index], index+1, dp); //index及之后 和为sum - nums[index]的数量
+        int cnt2 = helper(nums, sum + nums[index], index+1， dp);
+        return memo[index][sum] = cnt1 + cnt2;
+    }
+
+
+    //到第i步，sum = k，有多少种
+    int findTargetSumWays(vector<int>& nums, int S) {
+        int n = nums.size();
+        vector<unordered_map<int, int>> dp(n + 1);
+        dp[0][0] = 1;
+        for (int i = 0; i < nums.size(); i++) {
+            for (auto &a : dp[i]) {
+                int sum = a.first, cnt = a.second;
+                dp[i+1][sum + nums[i]] += cnt;
+                dp[i+1][sum - nums[i]] += cnt;
+            }
+        }
+        return dp[n][S];
+    }
+
+    int findTargetSumWays(vector<int>& nums, int S) {
+        vector<vector<int>> dp(nums.size(), (2001, 0));
+        dp[0][0 + nums[0] + 1000] = 1;
+        dp[0][0 - nums[0] + 1000] +=1;
+        for (int i = 1; i < nums.size(); i++) {
+            for (int sum = -1000; sum <= 1000; sum++) {
+                if (dp[i - 1][sum + 1000] > 1) {
+                    dp[i][sum + nums[i] + 1000] += dp[i - 1][sum + 1000];
+                    dp[i][sum - nums[i] + 1000] += dp[i - 1][sum + 1000];
+                }
+            }
+        }
+        return S > 0 ? 0 : dp[nums.size() - 1][S + 1000];
+    }
+};
