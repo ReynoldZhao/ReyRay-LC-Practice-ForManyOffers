@@ -2031,7 +2031,32 @@ public:
         return res;
     }
 
+    int findLongestChain(vector<vector<int>>& pairs) {
+        int res = 0, end = INT_MIN;
+        sort(pairs.begin(), pairs.end(), [](vector<int>& a, vector<int>& b) {
+            return a[1] < b[1];
+        });
+        for (auto pair : pairs) {
+            if (pair[0] > end) {
+                ++res;
+                end = pair[1];
+            }
+        }
+        return res;
+    }
+
     //DP
+    // class Solution(object): #Time Limit Exceeded
+    // def findLongestChain(self, pairs):
+    //     pairs.sort()
+    //     dp = [1] * len(pairs)
+
+    //     for j in xrange(len(pairs)):
+    //         for i in xrange(j):
+    //             if pairs[i][1] < pairs[j][0]:
+    //                 dp[j] = max(dp[j], dp[i] + 1)
+
+    //     return max(dp)
 
 };
 
@@ -2136,5 +2161,121 @@ public:
             }
         }
         return S > 0 ? 0 : dp[nums.size() - 1][S + 1000];
+    }
+};
+
+class SolutionR354 {
+public:
+    int maxEnvelopes(vector<vector<int>>& envelopes) {
+        sort(envelopes.begin(), envelopes.end(),[](vector<int> a, vector<int> b){
+            return a[0] == b[0] ? a[1] < b[1]:a[0] < b[0];
+        });
+        stack<vector<int>> s;
+        int res = INT_MIN;
+        for (auto env:envelopes) {
+            if (s.empty()) s.push(env);
+            else {
+                auto temp = s.top();
+                if (env[0] > temp[0] && env[1] > temp[1]) {
+                    s.push(env);
+                }
+            }
+        }
+        int size = s.size();
+        res = max(res, size);
+        sort(envelopes.begin(), envelopes.end(),[](vector<int> a, vector<int> b){
+            return a[1] == b[1] ? a[0] < b[0]:a[1] < b[1];
+        });
+        stack<vector<int>> st;
+        for (auto env:envelopes) {
+            if (st.empty()) st.push(env);
+            else {
+                auto temp = st.top();
+                if (env[0] > temp[0] && env[1] > temp[1]) {
+                    st.push(env);
+                }
+            }
+        }
+        size = st.size();
+        res = max(res, size);
+        return res;
+    }
+
+    int maxEnvelopes(vector<vector<int>>& envelopes) {
+        sort(envelopes.begin(), envelopes.end(),[](vector<int> a, vector<int> b){
+            return a[0] == b[0] ? a[1] < b[1]:a[0] < b[0];
+        });
+        vector<vector<int>> dp(envelopes[0]);
+        for (int i = 1; i < envelopes.size(); i++) {
+            auto temp = dp.back();
+            if (envelopes[i][0] > temp[0] && envelopes[i][1] > temp[1]) {
+                dp.push(envelopes[i]);
+            }
+            else {
+                int left = 0, right = envelopes.size() - 1;
+                while (left < right) {
+                    int mid = left + (right - left) / 2;
+                    if (square(envelopes[mid] < square(envelopes[i]))) {
+                        left = mid + 1;
+                    }
+                    else right = mid;
+                }
+                dp[right] = envelopes[i];
+            }
+        }
+        return dp.size();
+    }
+
+    int square(vector<int> v) {
+        return v[0] * v[1];
+    }
+
+    int maxEnvelopes(vector<vector<int>>& envelopes) {
+        int res = 0, n = envelopes.size();
+        vector<int> dp(n, 1);
+        sort(envelopes.begin(), envelopes.end());
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < i; j++) {
+                if (envelopes[i][0] > envelopes[j][0] && envelopes[i][1] > envelopes[j][1]) {
+                    dp[i] = max(dp[i], dp[j] + 1);
+                }
+            }
+            res = max(res, dp[i]);
+        }
+        return res;
+    }
+
+    // 
+};
+
+// 双数组dp
+// 如果将 dp[i] 定义为到i位置的最长子序列的个数的话
+//len[i] 表示以 nums[i] 为结尾的最长递推序列的长度
+//用 cnt[i] 表示以 nums[i] 为结尾的递推序列的个数
+class SolutionT673 {
+public:
+    int findNumberOfLIS(vector<int>& nums) {
+        int res = 0, mx = 0, n = nums.size();
+        vector<int> len(nums.size(), 1); //len[i] 表示以 nums[i] 为结尾的最长递推序列的长度
+        vector<int> cnt(nums.size(), 1); //用 cnt[i] 表示以 nums[i] 为结尾的递推序列的个数
+        for (int i = 1; i < nums; i++) {
+            for (int j = 0; j < i; j++) {
+                if (nums[i] < nums[j]) continue;
+                if (nums[i] > nums[j]) {
+                    if (len[i] < len[j] + 1) {
+                        cnt[i] = cnt[j];
+                        len[i] = len[j] + 1;
+                    } else if (len[i] == len[j] + 1){
+                        cnt[i] += cnt[j];
+                    }
+                } 
+            }
+            if (mx == len[i]) res+=cnt[i];
+            else if (mx < len[i]) {
+                mx = len[i];
+                res = cnt[i];
+            }
+        }
+        return res;
     }
 };

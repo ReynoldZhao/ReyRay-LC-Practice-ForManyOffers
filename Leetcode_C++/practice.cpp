@@ -774,3 +774,25 @@ public:
         
     }
 };
+
+class SolutionT1027 {
+public:
+    int longestArithSeqLength(vector<int>& A) {
+        vector<pair<int,int>> dp; //pair<len, dif>
+        if (A.size() <= 2) return A.size();
+        dp.push_back(make_pair(1, 0));
+        dp.push_back(make_pair(2, A[1] - A[0]));
+        for (int i = 2; i < A.size(); i++) {
+            int temp_len = 0, temp_dif = -10001;
+            for (int j = 0; j < i; j++) {
+                if (j == 0) {
+                    temp_len = 2;
+                    temp_dif = A[i] - A[0];
+                }
+                else {
+                    if (A[i] - A[j] == dp[j].second)
+                }
+            }
+        }
+    }
+};

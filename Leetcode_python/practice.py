@@ -799,10 +799,15 @@ class SolutionT493:
         dp = [1] + [0 for _ in range(P)]
         for num in nums:
             for j in range(P, num-1, -1):
-                dp[j] += dp[j - num]
+                dp[j] += dp[j - num] #j - num组成j - num有多少种可能 + num 都到j 
         return dp[P]
 
     def findTargetSumWays(self, nums: List[int], S: int) -> int:
         length, dp = len(nums), {(0, 0):1}
-        for i in range(1, length + 1)
-            
+        summary = sum(nums)
+        for i in range(1, length + 1) :
+            for j in range(-sum, sum+1):
+                # true index in nums is i-1
+                dp[(i, j)] = dp.get((i-1, j -nums[i-1]), 0) + dp.get((i-1, j + nums[i+1]), 0)
+        return dp.get((length, S), 0)
+
