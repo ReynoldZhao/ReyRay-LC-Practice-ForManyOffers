@@ -535,3 +535,376 @@ public:
         return max(leftD+1, rightD+1);
     }
 };
+
+class HeapSort {
+public:
+    void heapSort(vector<int> &arr) {
+        if (arr.size() < 2) return ;
+        for (int i = 0; i < arr.size(); i++) {
+            heapInsert(arr, i);
+        }
+        int size = arr.size()
+        swap(arr[0], arr[--size]);
+        //每次把最后一个元素找对位置
+        while (size > 0) {
+            heapify(arr, 0, size);
+            swap(arr[0], arr[--size]);
+        }
+    }
+
+    void heapInsert(vector<int> &arr, int index) {
+        int father = (index - 1) / 2;
+        while (arr[index] > arr[father] && index >= 0) {
+            swap(arr[index], arr[father]);
+            index = father;
+        }
+    }
+
+    void heapify(vector<int> &arr, int index, int size) {
+        int child = index*2 + 1;
+        while(child < size) {
+            int larger = child + 1 < size ? (arr[child +1] > arr[child] ? (child + 1):child):child;
+            larger = arr[index] > arr[larger] ? index : larger;
+            if (larger == index) {
+                break;
+            }
+            swap(arr[larger], arr[index]);
+            index = larger;
+            child = index * 2 + 1;
+        }
+    }
+};
+
+//滑动窗口
+
+//最大值
+class Solution {
+public:
+    vector<int> maxSlidingWindow(vector<int>& nums, int k) {
+        vector<int> res;
+        deque<int> dq;
+        for (int i = 0; i < k ;i ++) {
+            while (!dq.empty() && nums[i] >= nums[dq.back()]) dq.pop_back();
+            if (dq.empty() || nums[i] > nums[dq.back()]) dq.push_back(i);
+        }
+        res.push_back(nums[dq.front()]);
+        for (int i = k; i < nums.size(); i++) {
+            while(!dq.empty() && nums[i] >= nums[dq.back()]) dq.pop_back();
+            if (dq.front() <= i - k) dq.pop_front();
+            if (dq.empty() || nums[i] > nums[dq.back()]) dq.push_back(i);
+            res.push_back(nums[dq.front()]);
+        }
+        return res;
+    }
+};
+
+//中位数
+
+class SolutionT480 {
+public:
+    vector<double> medianSlidingWindow(vector<int>& nums, int k) {
+        vector<double> res;
+        multiset<double> set(nums.begin(), nums.begin() + k);
+        auto mid = next(nums.begin(), k / 2); //永远指向后一个的那个 3, 0 + 1 = 1 // 4, 0 + 2 = 2(1,2)
+        for (int i = k; i < nums.size(); i++) {
+            res.push_back((*mid + *prev(mid, 1 - k%2)/2));
+            if (i == nums.size()) return res;
+            if (nums[i] < *mid) --mid;
+            if (nums[i - k] <= *mid) ++mid;
+            set.erase(set.lower_bound(nums[i-k]));
+        }
+    }
+
+    vector<double> medianSlidingWindow(vector<int>& nums, int k) {
+        vector<double> res;
+        multiset<int> small, large;
+        for (int i = 0; i < nums.size(); ++i) {
+            if (i >= k) {
+                if (small.count(nums[i - k])) small.erase(small.find(nums[i - k]));
+                else if (large.count(nums[i - k])) large.erase(large.find(nums[i - k]));
+            }
+                if (small.size() <= large.size()) {
+                    if (large.empty() || nums[i] <= *large.begin()) small.insert(nums[i]);
+                    else {
+                        small.insert(*large.begin());
+                        large.erase(large.begin());
+                        large.insert(nums[i]);
+                    }
+                } else {
+                    if (nums[i] >= *small.rbegin()) large.insert(nums[i]);
+                    else {
+                        large.insert(*small.rbegin());
+                        small.erase(--small.end());
+                        small.insert(nums[i]);
+                    }
+                }
+
+            if (i >= (k - 1)) {
+                if (k % 2) res.push_back(*small.rbegin());
+                else res.push_back(((double)*small.rbegin() + *large.begin()) / 2);
+            }
+        }
+    }
+};
+
+//T295 数据流的中位数
+class MedianFinder {
+public:
+    /** initialize your data structure here. */
+    MedianFinder() {
+
+    }
+    
+    void addNum(int num) {
+        maxHeap.push(num);
+        minHeap.push(maxHeap.top());
+        maxHeap.pop();
+        if (maxHeap.size() < minHeap.size()) {
+            maxHeap.push(minHeap.top());
+            minHeap.pop();
+        }
+    }
+    
+    double findMedian() {
+        return maxHeap.size() == minHeap.size()?0.5*(maxHeap.top()+minHeap.top()):minHeap.top();
+    }
+private:
+    priority_queue<int, vector<int>, less<int>> maxHeap;
+    priority_queue<int, vector<int>, greater<int>> minHeap;
+};
+
+//骰子概率
+class Solution {
+public:
+    vector<double> twoSum(int n) {
+        vector<double> pre = {double(1/6),double(1/6),double(1/6),double(1/6),double(1/6),double(1/6)};
+        for (int i = 2; i <= n; i++) {
+            vector<double> temp(5*i+1);
+            for (int j = 0; j <pre.size(); j++) {
+                for (int x = 0; x < 6; x++) {
+                    temp[j + x] += pre[j]/6;
+                }
+                pre = temp;
+            }
+        }
+        return pre;
+    }
+};
+
+class Solution {
+public:
+    int lastRemaining(int n, int m) {
+        vector<int> v;
+        for (int i = 0; i < n; i++) {
+            v.push_back(i);
+        }
+        int index = 0;
+        while(n > 1) {
+            index = (index + m - 1)%n;
+            v.erase(v.begin() + index);
+            n--;
+        }
+        return v.back();
+    }
+};
+
+class SolutionT03 {
+public:
+    int findRepeatNumber(vector<int>& nums) {
+        int temp;
+        for (int i = 0; i < nums.size(); i++) {
+            while(nums[i]!=i) {
+                if(nums[i] == nums[nums[i]]) return nums[i];
+                temp = nums[i];
+                nums[i] = nums[temp];
+                nums[temp] = temp;
+            }
+        }
+    }
+};
+
+
+class Solution {
+    public int findRepeatNumber(int[] nums) {
+        int temp;
+        for(int i=0;i<nums.length;i++){
+            while (nums[i]!=i){
+                if(nums[i]==nums[nums[i]]){
+                    return nums[i];
+                }
+                temp=nums[i];
+                nums[i]=nums[temp];
+                nums[temp]=temp;
+            }
+        }
+        return -1;
+    }
+}
+
+class Node {
+public:
+    int val;
+    Node* left;
+    Node* right;
+
+    Node() {}
+
+    Node(int _val) {
+        val = _val;
+        left = NULL;
+        right = NULL;
+    }
+
+    Node(int _val, Node* _left, Node* _right) {
+        val = _val;
+        left = _left;
+        right = _right;
+    }
+};
+
+class SolutionTOffer36 {
+public:
+
+    Node* head = nullptr;
+    Node* pre = nullptr;
+    Node* treeToDoublyList(Node* root) {
+        if(!root) return nullptr;
+        dfs(root);
+        head->left = pre;
+        pre->right = head;
+    }
+
+    void dfs(Node* cur) {
+        if(!cur) return;
+        dfs(cur->left);
+        if(pre) {
+            pre->right = cur;
+            cur->left = pre;
+        } else head = cur;
+        pre = cur;
+        dfs(cur->right);
+    }
+};
+
+//字符串排列，两个高效的剪枝
+class Solution {
+public:
+    vector<string> permutation(string s) {
+        vector<string> res;
+
+        dfs(res,s,0);
+       
+        return res;
+    }
+
+    void  dfs(vector<string> &res,string &s,int pos){
+        if(pos == s.size())
+            res.push_back(s);
+
+        for(int i=pos;i<s.size();i++){
+            bool flag = true;
+            for(int j = pos;j<i;j++)//字母相同时，等效，剪枝
+                if(s[j] == s[i])
+                    flag = false;
+            if(flag){
+                swap(s[pos],s[i]);
+                dfs(res,s,pos+1);
+                swap(s[pos],s[i]);
+
+            }
+        }
+    }
+};
+
+class Solution {
+public:
+    vector<string> res;
+    vector<string> permutation(string s) {
+        vector<char> temp;
+        for(int i = 0;i < s.length();i++)
+            temp.push_back(s[i]);
+        sort(temp.begin(),temp.end(),compare);
+        dfs(temp,0);
+        return res;
+    }
+    void dfs(vector<char> temp,int left){
+        if(left == temp.size()-1){
+            string s;
+            for(int i = 0;i < temp.size();i++)
+                s += temp[i];
+            res.emplace_back(s);
+            return;
+        }
+        for(int i = left;i < temp.size();i++){
+            if(i != left && temp[left] == temp[i])
+                continue;
+            swap(temp[left],temp[i]);
+            dfs(temp,left+1);
+        }
+    }
+    static bool compare(const char& a,const char& b){
+        return a <= b;
+    }
+};
+
+//my 回溯
+class Solution {
+public:
+    vector<string> permutation(string s) {
+        vector<string> res;
+        helper(s, 0, res);
+        return res;
+    }
+
+    void helper(string &s, int index, vector<string> &res) {
+        if (index == s.size() - 1) {
+            res.push_back(s);
+            return;
+        }
+        for (int i = index; i < s.size(); i++) {
+            if (i!=index && s[index] == s[i]) continue;
+            swap(s[i], s[index]);
+            helper(s, index+1, res);
+            swap(s[i], s[index]);
+        }
+    }
+};
+
+//第N位数字，这个n-1太妙了
+class Solution {
+public:
+    int findNthDigit(int n) {
+        long long len = 1, cnt = 9, start = 1;
+        while (n > len * cnt) {
+            n -= len*cnt;
+            len++;
+            cnt*=10;
+            start*=10;
+        }
+        start += (n - 1)/len;
+        string s = to_string(start);
+        return s[(n-1)%len] - '0';
+    }
+};
+
+class SolutionT92 {
+public:
+    ListNode* reverseBetween(ListNode* head, int m, int n) {
+        ListNode *cur = head, *end = nullptr;
+        ListNode* dummy = new ListNode(0);
+        dummy->next = head;
+        ListNode* pre = dummy;
+        for (int i = 1; i < m; i++) {
+            pre = cur;
+            cur = cur->next;
+        }
+        ListNode* tail = cur;
+        for (int i = m; i < n; i++) {
+            ListNode* nextNode = tail->next;
+            tail->next = nextNode->next;
+            nextNode->next = pre->next;
+            pre->next = nextNode;
+        }
+        return dummy->next;
+    }
+};

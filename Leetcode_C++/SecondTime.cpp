@@ -2279,3 +2279,37 @@ public:
         return res;
     }
 };
+
+class SolutionT11 {
+public:
+    int minArray(vector<int>& numbers) {
+        int left = 0, right = numbers.size() - 1;
+        while(left < right) {
+            int mid = left + (right - left) / 2;
+            if (numbers[mid] > numbers[right]) left = mid + 1;
+            else if (numbers[mid] < numbers[right]) right = mid;
+            else if (numbers[mid] == numbers[right]) {
+                while (right > mid && numbers[right] == numbers[mid]) right--;
+            }
+        }
+        return numbers[left];
+    }
+};
+
+class SolutionT1448 {
+public:
+    int goodNodes(TreeNode* root) {
+        int count = 0;
+        helper(root, count, INT_MIN);
+        return count;
+    }
+
+    void helper(const TreeNode* root, int &count, int maxV) {
+        if(!root) return;
+        if (root->val >= maxV) count++;
+        int *tempV = new int(max(root->val, maxV));
+        helper(root->left, count, *tempV);
+        helper(root->right, count, *tempV);
+        delete tempV;
+    }
+};
