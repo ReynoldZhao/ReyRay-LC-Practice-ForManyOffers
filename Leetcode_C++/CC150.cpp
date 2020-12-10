@@ -206,3 +206,30 @@ public:
         return res->next;
     }
 };
+
+class SolutionT1715 {
+    //也可以用字典前缀树做
+public:
+    string longestWord(vector<string>& words) {
+        unordered_set<string> allWords(words.begin(), words.end());
+        string ans;
+        for (auto word:allWords) {
+            auto tempCollects = allWords;
+            tempCollects.erase(word);
+            if (isCombined(word, tempCollects)) {
+                if (word.size() > ans.size())ans = word;
+                if (word.size() == ans.size())ans = min(ans, word);
+            }
+        }
+        return res;
+    }
+
+private:
+    bool isCombined(string word, unordered_set<string> &words) {
+        if (word.size() == 0) return true;
+        for (int i = 1; i <= word.size(); i++) {
+            if (words.count(word.substr(0, i)) && isCombined(word.substr(i), words)) return true;
+        }
+        return false;
+    }
+};

@@ -799,6 +799,180 @@ class SolutionT862 {
 public:
     int shortestSubarray(vector<int>& A, int K) {
         int n = A.size(), res = INT_MAX, sum = 0;
-        priori
+        priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int> > pq;
+        for (int i = 0; i < A.size(); i++) {
+            sum+=A[i];
+            if (!pq.empty() && sum - pq.top().first < K) {
+                pq.push({sum, i}); 
+                continue;
+            }
+            while(!pq.empty() && sum - pq.top().first >= K) {
+                res = min(res, i - pq.top().second);
+                pq.pop(); //可以分下一个比自己大 下一个比自己小来揣测这个pop
+            }
+            pq.push({sum, i}); 
+        }
+        return res == INT_MAX? -1 : res;
+    }
+
+    int shortestSubarray(vector<int>& A, int K) {
+        int n = A.size(), res = INT_MAX;
+        map<int, int> sumMap;
+        vector<int> sums(n + 1)
+        for (int i = 1; i <= n; i++) sum[i] = sum[i-1] + A[i-1];
+        for (int i = 0; i <= n; i++) {
+            auto pos = sumMap.upper_bound(sum[i] - K);
+            if (pos != sumMap.end()) {
+                for (auto it = sumMap.begin(); it != pos; it++) {
+                    res = min(res, i - it->second);
+                }
+                sumMap.erase(sumMap.begin(), pos);
+            }
+            sumMap[sum[i]] = i;
+        }
+        return res == INT_MAX? -1 : res;
+    }
+
+    int shortestSubarray(vector<int>& A, int K) {
+        int n = A.size(), res = INT_MAX;
+        deque<int> dq;
+        vector<int> sums(n + 1);
+        for (int i = 1; i <= n; ++i) sums[i] = sums[i - 1] + A[i - 1];
+        for (int i = 0; i <= n; i++) {
+            while(!dq.empty() && sum[i] - sum[dq.front()] >= K) {
+                res = min(res, i - dq.front());
+                dq.pop_front();
+            }
+            while(!dq.empty() && sum[i] <= sum[dq.back()]) dq.pop_back();
+            dq.push_back(i);
+        }
+        return res == INT_MAX? -1 : res;
+    }
+};
+
+class SolutionT128 {
+public:
+    //使用集合
+    int longestConsecutive(vector<int>& nums) {
+        unordered_set<int> set(nums.begin(), nums.end());
+        int res = 0;
+        for (auto num:nums) {
+            if (!set.count(num)) continue;
+            set.erase(num);
+            int pre = num-1, next = num+1;
+            while(set.count(pre)) s.erase(pre--);
+            while(set.count(next)) s.erase(next++);
+            res = max(res, next - pre - 1);
+        }
+        return res;
+    }
+
+    //dp
+    int longestConsecutive(vector<int>& nums) {
+        int res = 0;
+        unordered_map<int, int> m;
+        for (int num : nums) {
+            if (m.count(num)) continue;
+            int left = m.count(num - 1) ? m[num - 1] : 0;
+            int right = m.count(num + 1) ? m[num + 1] : 0;
+            int sum = left + right + 1;
+            m[num] = sum;
+            res = max(res, sum);
+            m[num - left] = sum;
+            m[num + right] = sum;
+        }
+        return res;
+    }
+
+    // public int longestConsecutive(int[] nums) {
+    //     if (nums.length == 0) return 0;
+
+    //     int n = nums.length, max = 1;
+    //     Set<Integer> set = new HashSet<>();
+    //     for (int v : nums) set.add(v);
+
+    //     for (int v : nums) {
+    //         // 技巧：如果比自己小的已经在了，自己便不用查了，剪枝
+    //         if (set.contains(v - 1)) continue;
+
+    //         int r = v; // r: right 表示「以 v 开头，能连续到多少」
+    //         while (set.contains(r + 1)) r++; // 逐个查看
+    //         max = Math.max(max, r - v + 1); // 记录区间 [v, r] 长度
+    //     }
+    //     return max;
+    // }
+
+    //并查集
+    // public int longestConsecutive(int[] nums) {
+    //     if (nums.length == 0) return 0;
+        
+    //     // 首次遍历，与邻居结盟
+    //     UnionFind uf = new UnionFind(nums);
+    //     for (int v : nums)
+    //         uf.union(v, v + 1); // uf.union() 结盟
+
+    //     // 二次遍历，记录领队距离
+    //     int max = 1;
+    //     for (int v : nums)
+    //         max = Math.max(max, uf.find(v) - v + 1); // uf.find() 查找领队
+    //     return max;
+    // }
+
+    // class UnionFind {
+    //     private int count;
+    //     private Map<Integer, Integer> parent; // (curr, leader)
+
+    //     UnionFind(int[] arr) {
+    //         count = arr.length;
+    //         parent = new HashMap<>();
+    //         for (int v : arr)
+    //             parent.put(v, v); // 初始时，各自为战，自己是自己的领队
+    //     }
+
+    //     // 结盟
+    //     void union(int p, int q) {
+    //         // 不只是 p 与 q 结盟，而是整个 p 所在队伍 与 q 所在队伍结盟
+    //         // 结盟需各领队出面，而不是小弟出面
+    //         Integer rootP = find(p), rootQ = find(q);
+    //         if (rootP == rootQ) return;
+    //         if (rootP == null || rootQ == null) return;
+
+    //         // 结盟
+    //         parent.put(rootP, rootQ); // 谁大听谁
+    //         // 应取 max，而本题已明确 p < q 才可这么写
+    //         // 当前写法有损封装性，算法题可不纠结
+
+    //         count--;
+    //     }
+
+    //     // 查找领队
+    //     Integer find(int p) {
+    //         if (!parent.containsKey(p))
+    //             return null;
+
+    //         // 递归向上找领队
+    //         int root = p;
+    //         while (root != parent.get(root))
+    //             root = parent.get(root);
+
+    //         // 路径压缩：扁平化管理，避免日后找领队层级过深
+    //         while (p != parent.get(p)) {
+    //             int curr = p;
+    //             p = parent.get(p);
+    //             parent.put(curr, root);
+    //         }
+
+    //         return root;
+    //     }
+    // }
+
+};
+
+class SolutionT11 {
+public:
+    int maxArea(vector<int>& height) {
+        for (int i = 0; i < height.size(); i++) {
+            
+        }
     }
 };
