@@ -968,11 +968,112 @@ public:
 
 };
 
+//双指针
 class SolutionT11 {
 public:
     int maxArea(vector<int>& height) {
         for (int i = 0; i < height.size(); i++) {
-            
+
         }
+    }
+};
+
+
+class Solution T41{
+public:
+    int firstMissingPositive(vector<int>& nums) {
+
+    }
+};
+
+class SolutionT72 {
+public:
+    int minDistance(string word1, string word2) {
+        int m = word1.size(), n = word2.size();
+        vector<vector<int>> memo(m, vector<int>(n));
+        return helper(word1, 0, word2, 0, memo);
+    }
+    int helper(string& word1, int i, string& word2, int j, vector<vector<int>>& memo) {
+        if (i == word1.size()) return (int)word2.size() - j;
+        if (j == word2.size()) return (int)word1.size() - i;
+        if (memo[i][j] > 0) return memo[i][j];
+        int res = 0;
+        if (word1[i] == word2[j]) {
+            return helper(word1, i + 1, word2, j + 1, memo);
+        } else {
+            int insertCnt = helper(word1, i, word2, j + 1, memo);
+            int deleteCnt = helper(word1, i + 1, word2, j, memo);
+            int replaceCnt = helper(word1, i + 1, word2, j + 1, memo);
+            res = min(insertCnt, min(deleteCnt, replaceCnt)) + 1;
+        }
+        return memo[i][j] = res;
+    }
+
+
+    //DP dp[i][j] word1 i位置 word2 j位置 最小替换
+    int minDistance(string word1, string word2) {
+        int m = word1.size(), n = word2.size();
+        vector<vector<int>> dp(m + 1, vector<int>(n + 1));
+        for (int i = 0; i <= m; ++i) dp[i][0] = i;
+        for (int i = 0; i <= n; ++i) dp[0][i] = i; //初始化
+        for (int i = 1; i <= m; ++i) {
+            for (int j = 1; j <= n; ++j) {
+                if (word1[i - 1] == word2[j - 1]) {
+                    dp[i][j] = dp[i - 1][j - 1];
+                } else {
+                    dp[i][j] = min(dp[i - 1][j - 1], min(dp[i - 1][j], dp[i][j - 1])) + 1;
+                    // dp[i][j] = min(替换，min(删除，插入))；
+                }
+            }
+        }
+        return dp[m][n];
+    }
+
+};
+
+class SolutionT658 {
+public:
+    //反向思维，从数组中去除n-k个元素，肯定是从头尾去除
+    vector<int> findClosestElements(vector<int>& arr, int k, int x) {
+        vector<int> res = arr;
+        while (res.size() > k) {
+            if (x - res.front() <= res.back() - x) {
+                res.pop_back();
+            } else {
+                res.erase(res.begin());
+            }
+        }
+        return res;
+    }
+
+    vector<int> findClosestElements(vector<int>& arr, int k, int x) {
+        auto itr = lower_bound(arr.begin(), arr.end(), x);
+        int index = itr - arr.begin();
+        vector<int> res({arr[index]});
+        int pre = index - 1 >= 0 ? index - 1:-1, next = index+1 < arr.size()?:index+1:arr.size();
+        while(k > 0) {
+            if (pre < 0 || next >= arr.size()) {
+                res.push_back(arr[pre<0?next++:pre--]);
+                k--;
+            }
+            if (abs(x - arr[pre]) <= abs(arr[next] - x)) {
+                res.push_back(arr[pre--]);
+            } else {
+                res.push_back(arr[next++]);
+            }
+            k--;
+        }
+        return res;
+    }
+
+    //巧妙二分, 这个设计胎牛皮了
+    vector<int> findClosestElements(vector<int>& arr, int k, int x) {
+        int l = 0, r = arr.size() - k;
+        while (l < r) {
+            int mid = l + (r - l)/2;
+            if (x - arr[mid] > arr[mid] - x) l = mid + 1;
+            else r = mid;
+        }
+        return vector<int>(arr.begin() + l, arr.begin() + l + k);
     }
 };
