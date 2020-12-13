@@ -1077,3 +1077,11 @@ public:
         return vector<int>(arr.begin() + l, arr.begin() + l + k);
     }
 };
+
+//二分 DP 真的很屌
+class SolutionT410 {
+public:
+    int splitArray(vector<int>& nums, int m) {
+
+    }
+};

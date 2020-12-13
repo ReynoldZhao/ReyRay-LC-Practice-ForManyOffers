@@ -908,3 +908,60 @@ public:
         return dummy->next;
     }
 };
+
+class Solution {
+public:
+    vector<string> generateParenthesis(int n) {
+        int left = n, right = n;
+        vector<string> res;
+        string temp = "";
+        helper(temp, left, right, res);
+        return res;
+    }
+
+    void helper(string& temp, int left, int right, vector<string> &res) {
+        if (left == 0 && right ==0) {
+            res.push_back(temp);
+            return;
+        }
+        if (left > right) return ;
+        if (left == right) {
+            helper(temp+'(', left-1, right, res);
+        }
+        else {
+            helper(temp+'(',-1 right, res);
+            helper(temp+')', left, right-1, res);
+        }
+        return ;
+    }
+};
+
+class SolutionT55 {
+public:
+    bool canJump(vector<int>& nums) {
+        int maxJump = 0;
+        for (auto num : nums) {
+            if (maxJump >= n - 1|| i > maxJump) break;
+            maxJump = max(maxJump, num[i] + i);
+        }
+        return ;
+    }
+};
+
+class SolutionT45 {
+public:
+    int jump(vector<int>& nums) {
+        int res = 0, n = nums.size(), i = 0, cur = 0;
+        while (cur < n - 1) {
+            ++res;
+            int pre = cur;
+            for (; i <= pre; ++i) {
+                cur = max(cur, i + nums[i]);
+            }
+            if (pre == cur) return -1; // May not need this
+        }
+        return res;
+    }
+};
+
+

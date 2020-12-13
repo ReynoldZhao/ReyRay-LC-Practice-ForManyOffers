@@ -127,6 +127,40 @@ void qSort(vector<int> &arr) {
     return quickSort(arr, 0, arr.size()-1);
 }
 
+//Three way QuickSort
+
+void quickSort3Way(vector<int> arr, int l, int r) {
+ 
+	if (l >= r)
+		return;
+ //随机选择要做比较的值
+	swap(arr[l], arr[rand() % (r - l + 1) + l]);
+	int v = arr[l];
+	int i = l + 1, lt=l,rt = r;
+    //已有序游标为lt，如果pivot是最右值，游标初始值为l - 1;
+    // --- lt(最后一个小于) ---- rt（第一个大于） ----
+	while (i<rt) {
+		if (arr[i] < v) {
+			swap(arr[i], arr[lt+1]);
+			lt++;
+			i++;
+		}
+		if (arr[i] == v) {
+			i++;
+		}
+		if (arr[i] > v) {
+			swap(arr[i], arr[rt]);
+			rt--;
+            //注意这里i不变化
+		}
+ 
+	}
+	swap(arr[l], arr[lt]);
+	quickSort3Way(arr, l, lt-1 );
+	quickSort3Way(arr, rt, r);
+ 
+}
+
 
 // MergeSort 
 void mergeSort(vector<int> &a, vector<int> &T, int left, int right)
