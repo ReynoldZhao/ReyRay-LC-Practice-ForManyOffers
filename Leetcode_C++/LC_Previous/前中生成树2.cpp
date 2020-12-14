@@ -25,10 +25,10 @@ public:
     	if(n==0) return NULL;
     	if(n==1)
         	{   
-           TreeNode *root = new TreeNode(vp[p]);
-				root->left = NULL;
-				root->right = NULL;
-				return root;
+				TreeNode *root = new TreeNode(vp[p]);
+						root->left = NULL;
+						root->right = NULL;
+						return root;
 			}
         TreeNode *root = new TreeNode(vp[p]);
 			int j;

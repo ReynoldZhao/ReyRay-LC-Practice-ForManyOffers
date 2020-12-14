@@ -964,4 +964,44 @@ public:
     }
 };
 
+//接雨水
+class SolutionT42 {
+public:
+    int trap(vector<int>& height) {
+        int res = 0, mx = 0, n = height.size();
+        vector<int> dp(n, 0);
+        for (int i = 0; i < n; i++) {
+            dp[i] = mx;
+            mx = max(mx, height[i]);
+        }
+        mx = 0;
+        for (int i = n - 1; i >= 0; i--) {
+            dp[i] = min(dp[i], mx)
+            mx = max(mx, height[i]);
+            if (dp[i] > height[i]) res+=dp[i] - height[i];
+        }
+        return res;
+    }
+};
+
+//局部峰值，找到数组的形式规律
+class SolutionT84 {
+public:
+    int largestRectangleArea(vector<int> &height) {
+        int res = 0;
+        for (int i = 0; i < height.size(); ++i) {
+            if (i + 1 < height.size() && height[i] <= height[i + 1]) {
+                continue;
+            }
+            int minH = height[i];
+            for (int j = i; j >= 0; --j) {
+                minH = min(minH, height[j]);
+                int area = minH * (i - j + 1);
+                res = max(res, area);
+            }
+        }
+        return res;
+    }
+};
+
 
