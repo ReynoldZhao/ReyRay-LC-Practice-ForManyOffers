@@ -89,6 +89,7 @@ public:
         return res;
     }
 
+//我更喜欢这种
     vector<int> preorderTraversal1(TreeNode* root) {
         vector<int> res;
         stack<TreeNode*> st;
@@ -169,7 +170,7 @@ public:
         while (p || !s.empty()) {
             if (p) {
                 s.push(p);
-                res.push_back(res.begin(), p->val);
+                res.insert(res.begin(), p->val);
                 p = p->right;
             }
             else {
@@ -177,6 +178,7 @@ public:
                 p = p->left;
             }
         }
+        return res;
     }
 
     vector<int> postorderTraversal3(TreeNode* root) {

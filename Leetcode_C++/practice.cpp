@@ -1085,3 +1085,61 @@ public:
 
     }
 };
+
+class Solution {
+public:
+    int longestCommonSubsequence(string text1, string text2) {
+        int m = text1.size(), n = text2.size();
+        string lo = m > n?text1:text2;
+        string sh = m > n?text2:text1;
+        int i = 0, j = 0;
+        int lar = m > n?m:n, sma = m > n?n:m;
+        int res = 0;
+        while (i < lar && j < sma) {
+            if (text1[i] == text2[j]) {
+                res++; i++; j++;
+            }
+            else i++;
+        }
+        return res;
+    }
+};
+
+//excellent idea
+class SolutionT123 {
+public:
+    int maxProfit(vector<int>& prices) {
+        int cost1 = INT_MAX, cost2 = INT_MAX, profit1 = 0, profit2 = 0;
+
+        for (int i = 0; i < prices.size(); i++) {
+            cost1 = min(cost1, prices[i]);
+            pro1 = max(pro1, prices[i] - cost1);
+            cost2 = min(cost2, prices[i] - pro1); //把前一次的利润算进成本
+            pro2 = max(pro2, prices[i] - cost2);
+        }
+        return pro2;
+    }
+};
+
+class SolutionT23 {
+public:
+    ListNode* mergeKLists(vector<ListNode*>& lists) {
+        auto cmp = [](ListNode* A, ListNode* B) {
+            return A->val > B->val;
+        }
+        priority_queue<ListNode*, vector<ListNode*>, decltype(cmp)> pq(cmp);
+        for (auto node:lists) {
+            if (node) pq.push(node);
+        }
+        ListNode* dummy = new ListNode(-1), *cur = dummy;
+        while (!pq.empty())
+        {
+            ListNode* temp = pq.top(); pq.pop();
+            cur->next = temp;
+            cur = cur->next;
+            if (temp->next) pq.push(temp->next);
+        }
+        return dummy->next;
+    }
+
+};

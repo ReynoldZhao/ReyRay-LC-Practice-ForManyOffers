@@ -60,6 +60,8 @@ public:
     }
 };
 
+
+
 void swap(int &a, int &b) {
     int temp = a;
     a = b;
@@ -93,7 +95,7 @@ void selectionSort(vector<int> &a)
 }
 
 void insertSort(vector<int> &arr) {
-    for (int i = 0; i < arr.size(); i++) {
+    for (int i = 0; i < arr.size() - 1; i++) {
         int j = i;
         int temp = a[i+1];
         while (j >= 0 && a[j] > temp) {
@@ -260,14 +262,14 @@ public class HeapSort {
             swap(arr, 0, --size);
         }
     }
-
+//大顶
     public static void heapInsert(int[] arr, int index) {
         while (arr[index] > arr[(index - 1) / 2]) {
             swap(arr, index, (index - 1) / 2);
             index = (index - 1) / 2;
         }
     }
-
+//大顶堆
     public static void heapify(int[] arr, int index, int size) {
         int left = index * 2 + 1;
         while (left < size) {
@@ -292,5 +294,43 @@ public class HeapSort {
         int []arr={1,34,4,5,76,8,9};
         heapSort(arr);
         System.out.println(Arrays.toString(arr));
+    }
+}
+
+class HeapSort {
+public:
+    void heapSort(vector<int> &arr) {
+        if (arr.empty() || arr.size() < 2) {
+             return ;
+        }
+        int n = arr.size();
+        for (int i = 0; i < arr.size(); i++) {
+            heapInsert(arr, i);
+        }
+        swap(arr[0], arr[--n]);
+        while (n > 0) {
+            heapify(arr, 0, n);
+            swap(arr[0], arr[--n]);
+        }
+    }
+private:
+//bottom - up
+    void heapInsert(vector<int> &arr, int index) {
+        while ((index-1)/2 >= 0 && arr[index] > arr[(index-1)/2]) {
+            swap(arr[index], arr[(index-1)/2]);
+            index = (index-1)/2;
+        }
+    }
+//up-down
+    void heapify(vector<int> &arr, int index, int size) {
+        int child = index * 2 + 1;
+        while (child < size) {
+            int largest = left + 1 < size && arr[left + 1] > arr[left] ? left + 1 : left;
+            largest = arr[largest] > arr[index] ? largest:index;
+            if (largest == index) break;
+            swap(arr[largest], arr[index]);
+            index = largest;
+            child = index*2 + 1;
+        }
     }
 }
