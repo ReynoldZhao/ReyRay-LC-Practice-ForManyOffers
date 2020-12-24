@@ -1022,3 +1022,97 @@ public:
     }
 };
 
+class SolutionToffer36 {
+public:
+    Node* head = NULL;
+    Node* pre = NULL;
+    Node* treeToDoublyList(Node* root) {
+        if (!root) return nullptr;
+        dfs(root);
+        head->left = pre;
+        pre->right = head;
+        return head;
+    }
+
+    void dfs(Node* root) {
+        if(!root) return ;
+        dfs(root->left);
+        if(pre) {
+            root->left = pre;
+            pre->right = root;
+        } else head = root;
+        pre = root;
+        dfs(root->right);
+        return ;
+    }
+
+    Node* treeToDoublyList(Node* root) {
+        Node* p = root;
+        stack<Node*> st;
+        while(p || !st.empty()) {
+            while(p) {
+                st.push(p);
+                p = p->left;
+            }
+            p = st.top(); st.pop();
+            if (pre) {
+                p->left = pre;
+                pre->right = p;
+            } else head = p;
+            pre = p;
+            p = p->right;
+        }
+        head->left = pre;
+        pre->right = head;
+        return head;
+    } 
+};
+
+class Solution {
+public:
+    bool verifyPostorder(vector<int>& postorder) {
+        return helper(postorder, 0, postorder.size() - 1);
+    }
+
+    bool helper(vector<int>& postorder, int start, int end) {
+        int pivot = postorder[end];
+        int m = start;
+        while(postorder[m] < pivot) m++;
+        int n = m;
+        while(postorder[n] > pivot) n++;
+        if(n == end) return helper(postorder, start, m - 1) && helper(postorder, m, n-1);
+        else return false;
+    }
+};
+
+class Solution {
+public:
+    ListNode* sortList(ListNode* head) {
+        ListNode *slow = head, *fast = head, *pre = head;
+        while(fast && fast->next->next) {
+            pre = slow;
+            slow = slow->next;
+            fast = fast->next->next;
+        }
+        pre->next = nullptr;
+        return merge(sortList(head), sortList(pre->next));
+        return head;
+    }
+
+    ListNode* merge(ListNode* l1, ListNode* l2) {
+        ListNode* dummy = new ListNode(-1);
+        ListNode* cur = dummy;
+        while(l1 && l2) {
+            if (l1->val < l2->val) {
+                cur->next = l1;
+                l1 = l1->next;
+            } else {
+                cur->next = l2;
+                l2 = l2->next;
+            }
+            cur = cur->next;
+        }
+        cur->next =  l1?l1:l2;
+        return dummy->next;
+    }
+};

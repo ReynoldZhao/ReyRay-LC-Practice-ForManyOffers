@@ -1141,5 +1141,172 @@ public:
         }
         return dummy->next;
     }
+};
 
+class SolutionT209 {
+public:
+    int minSubArrayLen(int s, vector<int>& nums) {
+        sort(nums.begin(), nums.end());
+        int l = 0, r = 0, sum = 0, len = nums.size();
+        int res = INT_MAX;
+        while (r < len) {
+            while(sum < s && r < len) {
+                sum += nums[r++];
+            }
+            while(sum >= s) {
+                res = min(res, r - l);
+                sum -= nums[l++];
+            }
+        }
+        return res == INT_MAX?0:res;
+    }
+};
+
+class Solution {
+public:
+    string longestPalindrome(string s) {
+        int len = s.size();
+        vector<vector<int>> dp(len, vector<int>(len, 0));
+        int res = 0, start = 0;
+        for (int i = 0; i < len; i++) {
+            dp[i][i] = 1;
+            for (int j = i+1; j <len; j++) {
+                if (s[i] != s[j]) continue;
+                dp[i][j] = j - i <= 2?1:dp[i+1][j-1];
+                if (dp[i][j] && j - i + 1 > res) {
+                    res = j - i + 1;
+                    start = i;
+                }
+            }
+        }
+        return s.substr(start, res);
+    }
+};
+
+class Solution {
+public:
+    vector<vector<int>> merge(vector<vector<int>>& intervals) {
+        sort(intervals.begin(), intervals.end());
+        vector<vector<int>> res;
+        int len = intervals.size(), i = 0;
+        while (i < len) {
+            vector<int> temp;
+            temp.push_back(intervals[i][0]);
+            int temp_end = intervals[i][1], j = i+1;
+            while (j < len) {
+                if (intervals[j][1] <= temp_end) {
+                    j++;
+                }
+                else if (intervals[j][0] <= temp_end && intervals[j][1] > temp_end) {
+                    temp_end = intervals[j][1];
+                    j++;
+                } else break;
+            }
+            temp.push_back(temp_end);
+            i = j;
+            res.push_back(temp);
+        }
+        return res;
+    }
+
+    vector<vector<int>> merge(vector<vector<int>>& intervals) {
+        if (intervals.empty()) return {};
+        sort(intervals.begin(), intervals.end());
+        vector<vector<int>> res{intervals[0]};
+        for (int i = 1; i < intervals.size(); ++i) {
+            if (res.back()[1] < intervals[i][0]) {
+                res.push_back(intervals[i]);
+            } else {
+                res.back()[1] = max(res.back()[1], intervals[i][1]);
+            }
+        }   
+        return res;
+    }
+};
+
+class SolutionT98 {
+public:
+    bool isValidBST(TreeNode* root) {
+        if (!root) return true;
+        stack<TreeNode*> st;
+        vector<int> v;
+        TreeNode* p = root;
+        while(!st.empty() || p) {
+            while(p) {
+                st.push(p);
+                p = p->left;
+            }
+            p = st.front();
+            v.push_back(p->val);
+            p = p->right;
+        }
+        for (int i = 0; i < v.size()-1; i++) {
+            if (v[i] > v[i+1]) return false;
+        }
+        return true;
+    }
+
+    bool isValidBST(TreeNode* root) {
+        return helper(root, INT_MIN, INT_MAX);
+    }
+
+    bool helper(TreeNode* root, int min, int max) {
+        if(!root) return true;
+        if (root->val > min && root->val < max) {
+            return helper(root->left, min, root->val) && helper(root->right, root->val, max);
+        } else {
+            return false;
+        }
+    }    
+};
+
+class Solution {
+public:
+    void rotate(vector<vector<int>>& matrix) {
+        int n = matrix.size();
+        for (int i = 0; i < n/2; i++) {
+            for (int j = i; j <= n - i - 2; j++) {
+                int tmp = matrix[i][j];
+                matrix[i][j] = matrix[n - 1 - j][i];
+                matrix[n - 1 - j][i] = matrix[n - 1 - i][n - 1 - j];
+                matrix[n - 1 - i][n - 1 - j] = matrix[j][n - 1 - i];
+                matrix[j][n - 1 - i] = tmp;
+            }
+        }
+    }
+};
+
+class SolutionT114 {
+public:
+    void flatten(TreeNode* root) {
+        if (!root) return ;
+        TreeNode* temp = helper(root);
+        return ;
+    }
+
+    TreeNode* helper(TreeNode* root) {
+        if (!root) return nullptr;
+        TreeNode* leftNode = helper(root->left);
+        TreeNode* rightNode = helper(root->right);
+        TreeNode* cur = leftNode;
+        while(cur && cur->right) cur = cur->right;
+        if(cur) {
+            cur->right = rightNode;
+            root->right = leftNode;
+            root->left = nullptr; 
+        } else {
+            root->right = rightNode;
+        }
+        return root;
+    }
+
+    void flatten(TreeNode* root) {
+        if (!root) return ;
+        if (root->left) flatten(root->left);
+        if (root->right) flatten(root->right);
+        TreeNode *temp = root->right, *cur = root->left;
+        root->right = root->left;
+        while(root->right) root = root->right;
+        root->right = temp;
+    }
 };
