@@ -1310,3 +1310,82 @@ public:
         root->right = temp;
     }
 };
+
+class SolutionT349 {
+public:
+    vector<int> intersection(vector<int>& nums1, vector<int>& nums2) {
+        int m = nums1.size(), n = nums2.size();
+        sort(nums1.begin(), nums1.end());
+        sort(nums2.begin(), nums2.end());
+        int i = 0, j = 0;
+        vector<int> res;
+        while(i < m && j < n) {
+            if (nums1[i] > nums2[j]) j++;
+            else if (nums1[i] < nums2[j]) i++;
+            else {
+                res.push_back(nums1[i]);
+                i++; j++;
+            }
+            while(i+1 < m && nums1[i] == nums1[i+1]) i++;
+            while(j+1 < n && nums2[j] == nums2[j+1]) j++;
+        }
+        return res;
+    }
+};
+
+class SolutionT475 {
+public:
+    int findRadius(vector<int>& houses, vector<int>& heaters) {
+        int res = 0, n = heaters.size(), j = 0;
+        for (int i = 0; i < houses.size(); i++) {
+            int cur = houses[i];
+            while(j < n - 1 && abs(heaters[j] - cur) > abs(heaters[j+1] - cur)) j++;
+            res = max(res, abs(heaters[j] - cur));
+        }
+        return res;
+    }
+};
+
+class SolutionT441 {
+public:
+    int arrangeCoins(int n) {
+
+    }
+};
+
+class SolutionT354 {
+public:
+    int maxEnvelopes(vector<vector<int>>& envelopes) {
+        sort(envelopes.begin(), envelope.end());
+        int res = 0, n = envelopes.size();
+        for (int i = 0; i < n; i++) {
+
+        }
+    }
+};
+
+class Solution {
+public:
+    int maxSumSubmatrix(vector<vector<int>>& matrix, int k) {
+        int m = matrix.size(), n = matrix[0],size();
+        for (int j = 0; j < n; j++) { //固定左边界
+            vector<int> sum(m, 0); //固定左右边界后，每一row的和
+            for (int i = j; i < n; i++) { //固定右边界
+                for (int p = 0; p < m; p++) {
+                    sum[p] += matrix[p][j];
+                } //当前左右边界的子矩阵和
+                int curSum = 0;
+                set<int> st{{0}};
+                for (auto a:sum) {
+                    curSum += a; //当前左右边界，0-m,的子矩阵的和
+                    auto it = st.lower_bound(curSum - k); 
+                    //找到 《= k的最大子矩阵和 sum[j,i] = sum[i] - sum[j] <= k
+                    //curSum是累加到现在的sum[i], 要在集合里找到一个sum[j]
+                    // sum[j] >= sum[i] - k, 第一个不小于sum[i] - k的值，就是的
+                    if ( it != st.end() ) res = max(res, curSum - *it);
+                    st.insert(curSum); //当前左右边界，0-m,的子矩阵的和,放入到set中
+                }
+            }
+        }
+    }
+};

@@ -1116,3 +1116,34 @@ public:
         return dummy->next;
     }
 };
+
+class Solution322 {
+public:
+    int coinChange(vector<int>& coins, int amount) {
+        sort(coins.begin(), coins.end());
+        vector<int> dp(amount+1, 10005);
+        if (amount < coins[0]) return -1;
+        for (auto coin:coins) dp[coin] = 1;
+        for (int i = coins[0]; i <= amount; i++) {
+            for (auto coin:coins) {
+                dp[i] = min(dp[i], dp[i - coin] + 1); 
+            }
+        }
+        return dp[amount] > 10000?-1:dp[amount];
+    }
+};
+
+class Solution518 {
+public:
+    int change(int amount, vector<int>& coins) {
+        sort(coins.begin(), coins.end());
+        vector<int> dp(amount+1, 0);
+        dp[0] = 1;
+        for (int i = coins[0]; i <= amount; i++) {
+            for (auto coin:coins) {
+                if (i - coin >= 0) dp[i] = dp[i] + dp[i-coin];
+            }
+        }
+        return dp[amount];
+    }
+};
