@@ -36,3 +36,22 @@ public:
         return dp[m][n];
     }
 };
+
+class SolutionT32 {
+public:
+//32. Longest Valid Parentheses 最长有效括号
+    int longestValidParentheses(string s) {
+        int n = s.size(), res = 0;
+        vector<int> dp(n+1);//dp[i] 表示以s[i - 1] 结尾的最长有效括号字符串的长度
+        for (int i = 1; i < n; i++) {
+            int j = i - dp[i-1] - 2; // [j]  "(" (   dp[i-1]      ) ")"假设这里为i-1; j是前一个有效的开始
+            if (s[i-1] == '(' || j < 0 || s[j] == '(') {
+                dp[i] = 0;
+            } else {
+                dp[i] = dp[i-1] + 2 + dp[j];
+                res = max(res, dp[i]);
+            }
+        }
+        return res;
+    }
+};

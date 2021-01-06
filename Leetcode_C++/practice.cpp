@@ -1389,3 +1389,172 @@ public:
         }
     }
 };
+
+
+class SolutionT611 {
+public:
+//二分
+    int triangleNumber(vector<int>& nums) {
+        int n = nums.size();
+        int res = 0;
+        sort(nums.begin(), nums.end());
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                int sum = nums[i] + nums[j], left = j+1, right = n;
+                while (left < right) {
+                    int mid = left + (right - left)/2;
+                    if (nums[mid] < sum) left = mid + 1;
+                    else right = mid;
+                }
+                res += right - 1 - j;
+            }
+        }
+        return res;
+    }
+//
+};
+
+class SolutionT16 {
+public:
+    int threeSumClosest(vector<int>& nums, int target) {
+        sort(nums.begin(), nums.end());
+        int n = nums.size(), res = 0;
+        for (int i = 0; i <= n-3; i++) {
+            if (nums[i] + nums[n-2] + nums[n-1] < target) {
+                int temp_sum = nums[i] + nums[n-2] + nums[n-1]
+                res = abs(target - res) < abs(target - temp_sum) ? res:temp_sum;
+                continue;
+            } else if (nums[i] + nums[i+1] + nums[i+2] >= target) {
+                int temp_sum = nums[i] + nums[i+1] + nums[i+2];
+                res = abs(target - res) < abs(target - temp_sum) ? res:temp_sum;
+                break;
+            }
+            for (int j = i + 1; j <= n-2; j++) {
+                int temp_target = target - nums[i] - nums[j];
+                int left = j+1, right = n;
+                while(left < right) {
+                    int mid = left + (right - left)/2;
+                    if (nums[mid] < temp_target) left = mid+1;
+                    else right = mid;
+                }
+                int temp;
+                if (right == n) {
+                    temp_sum = nums[i] + nums[j] + nums[right-1];
+                    res = abs(target - res) < abs(target - temp_sum) ? res:temp_sum;
+                } else {
+                    temp_sum = nums[i] + nums[j] + nums[right];
+                    res = abs(target - res) < abs(target - temp_sum) ? res:temp_sum;
+                    if (right > j+1) {
+                        temp_sum = nums[i] + nums[j] + nums[right-1];
+                        res = abs(target - res) < abs(target - temp_sum) ? res:temp_sum;
+                    }
+                }
+            }
+        }
+        return res;
+    }
+};
+
+class SolutionT435 {
+public:
+    int eraseOverlapIntervals(vector<vector<int>>& intervals) {
+        int n = intervals.size();
+        sort(intervals.begin(), intervals.end());
+        vector<vector<int>> res;
+        for (int i = 0; i < n; i++) {
+            if (res.empty()) {
+                res.push_back(internals[i]);
+                continue;
+            }
+            auto temp_interval = intervals[i];
+            if (temp_interval[0] >= res.back()[1]) {
+                res.push_back(temp_interval);
+                continue;
+            }
+            while (temp_interval[1] < res.back()[1]) {
+                res.pop_back();
+                res.push_back(temp_interval);
+            }
+        }
+        return n - res.size();
+    }
+};
+
+class SolutionT86 {
+public:
+    ListNode* partition(ListNode* head, int x) {
+        ListNode *dummy = new ListNode(-1), *dummy2 = new ListNode(-1);
+        ListNode *pre = dummy2, *tail = dummy, *cur = head;
+        pre->next = head;
+        while(cur) {
+            if (cur->val < x) {
+                tail->next = cur;
+                pre->next = cur->next;
+                cur->next = nullptr;
+                cur = pre->next;
+                tail = tail->next;
+            } else {
+                cur = cur->next;
+                pre = pre->next;
+            }
+        }
+        tail->next = dummy2->next;
+        return dummy->next;
+    }
+};
+
+class SolutionT830 {
+public:
+    vector<vector<int>> largeGroupPositions(string s) {
+        int n = s.size();
+        vector<vector<int>> res;
+        for (int i = 0; i <= n-3; i++) {
+            int cur = i + 1;
+            while (cur <= n-1 && s[i] == s[cur]) cur++;
+            if (cur - i >= 3) res.push_back({i, cur-1});
+            i = cur;
+        }
+        return res;
+    }
+};
+
+class SolutionT32 {
+public:
+    int longestValidParentheses(string s) {
+        stack<int> st;
+        int res = 0, n = s.size(), start = 0;
+        for (int i = 0; i < n; i++) {
+            if (s[i] == '(') st.push(i);
+            else {
+                if (st.empty()) start = i + 1;
+                else {
+                    st.pop()
+                    res = st.empty()?max(res, i - start + 1):max(res, i - st.top());
+                }
+            }
+        }
+        return res;
+    }
+};
+
+class SolutionT76 {
+public:
+    string minWindow(string s, string t) {
+        unordered_map<char, int> bucket;
+        for (int i = 0; i < t.size(); i++) bucket[t[i]]++;
+        int left = 0, minLen = INT_MAX, n = s.size(), count = 0;
+        string res = "";
+        for (int i = 0; i < n; i++) {
+            if (--bucket(s[i]) >= 0) ++cnt;
+            while (cnt == t.size()) {
+                if (minLen > i - left + 1) {
+                    minLen = i - left + 1;
+                    res = s.substr(left, minLen);
+                }
+                if (++bucket[s[left]] > 0) --cnt;
+                ++left;
+            }
+        }
+        return res;
+    }
+};
