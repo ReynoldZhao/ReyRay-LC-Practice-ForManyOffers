@@ -94,3 +94,52 @@ class student{
     int main(){
         priority_queue<student>pq;
     }
+
+class SolutionT973 {
+public:
+    struct cmp {
+        bool operator() (pair<int, int> &a, pair<int, int> &b) {
+            return a.first  > b.first;
+        }
+    };
+    vector<vector<int>> kClosest(vector<vector<int>>& points, int K) {
+        // auto comp = [](pair<int, int> a, pair<int, int> b) {
+        //     return a.first < b.first;};
+        priority_queue<pair<int, int>, vector<pair<int, int>>, cmp> pq;
+        for (int i = 0; i < points.size(); i++) {
+            int prod = points[i][0] * points[i][0] + points[i][1] * points[i][1];
+            pq.push(make_pair(prod, i));
+        }
+        vector<vector<int>> res;
+        for (int i = 0; i < K; i++) {
+            auto temp = pq.top(); pq.pop();
+            res.push_back(points[temp.second]);
+        }
+        return res;
+    }
+};
+
+class SolutionT778 {
+public:
+    int swimInWater(vector<vector<int>>& grid) {
+        int res = 0, n = grid.size();
+        unordered_set<int> visited{0};
+        vector<vector<int>> dirs{{0, -1}, {-1, 0}, {0, 1}, {1, 0}};
+        auto cmp = [](pair<int, int>& a, pair<int, int>& b) {return a.first > b.first;};
+        // 这里写成greater，即为小顶堆
+        priority_queue<pair<int, int>, vector<pair<int, int>>, decltype(cmp) > q(cmp);
+        q.push({grid[0][0], 0});
+        while (!q.empty()) {
+            int i = q.top().second / n, j = q.top().second % n; q.pop();
+            res = max(res, grid[i][j]);
+            if (i == n - 1 && j == n - 1) return res;
+            for (auto dir : dirs) {
+                int x = i + dir[0], y = j + dir[1];
+                if (x < 0 || x >= n || y < 0 || y >= n || visited.count(x * n + y)) continue;
+                visited.insert(x * n + y);
+                q.push({grid[x][y], x * n + y});
+            }
+        }
+        return res;
+    }
+};

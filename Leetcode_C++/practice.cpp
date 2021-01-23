@@ -10,6 +10,7 @@
 #include<cstring>
 #include<string>
 #include<unordered_map>
+#include<unordered_set>
 #include<hash_map>
 #include<deque>
 using namespace std;
@@ -1558,3 +1559,517 @@ public:
         return res;
     }
 };
+
+class SolutionT849 {
+public:
+    int maxDistToClosest(vector<int>& seats) {
+        int res = INT_MAX, left = 0, n = seats.size(), right = n - 1;
+        vector<int> dist(seats.size(), 0);
+        int left = 0;
+        while(seats[left] != 1) left++;
+        for (int i = 0; i < n; i++) {
+            if (seats[i] > 0) {
+                left = max(left, i);
+                continue;
+            }
+            else {
+                dist[i] = abs(left - i);
+            }
+        }
+        int right = 0;
+        while(seats[right] != 1) right--;
+        for (int i = n - 1; i >= 0; i--) {
+            if (seats[i] > 0) {
+                right = min(right, i);
+                continue;
+            }
+            else {
+                int temp = abs(i - right);
+                dist[i] = min(dist[i], temp);
+                res = min(res, seats[i]);
+            }
+        }
+        return res;
+    }
+};
+
+class SolutionT560 {
+public:
+    int subarraySum(vector<int>& nums, int k) {
+        int res = 0, n = nums.size();
+        vector<int> sums = nums;
+        for (int i = 1; i < n; ++i) {
+            sums[i] = sums[i - 1] + nums[i];
+        }
+        for (int i = 0; i < n; ++i) {
+            if (sums[i] == k) ++res;
+            for (int j = i - 1; j >= 0; --j) {
+                if (sums[i] - sums[j] == k) ++res;
+            }
+        }
+        return res;
+    }
+
+    int subarraySum(vector<int>& nums, int k) {
+        int res = 0, sum = 0, n = nums.size();
+        unordered_map<int, int> map{{0,1}};
+        for (int i = 0; i < n; i++) {
+            sum += nums[i];
+            res += map[sum - k];
+            ++m[sum];
+        }
+        return res;
+    }
+};
+
+struct ListNode {
+    int val;
+    ListNode *next;
+    ListNode() : val(0), next(nullptr) {}
+    ListNode(int x) : val(x), next(nullptr) {}
+    ListNode(int x, ListNode *next) : val(x), next(next) {}
+};
+
+class SolutionT328 {
+public:
+    ListNode* oddEvenList(ListNode* head) {
+        ListNode *dummy = new ListNode(-1), *tailEven = dummy, *cur = head, *pre = head;
+        int count = 1;
+        while(cur) {
+            if (count % 2 == 0) {
+                ListNode* temp = cur->next;
+                tailEven->next = cur;
+                pre->next = cur->next;
+                cur->next = nullptr;
+                cur = temp;
+                tailEven = tailEven->next;
+            } else {
+                pre = cur;
+                cur = cur->next;
+            }
+            count++;
+        }
+        pre->next = dummy->next;
+        return head;
+    }
+
+    ListNode* oddEvenList(ListNode* head) {
+        if (!head || !head->next) return head;
+        ListNode *odd = head, *even = head->next, *even_head = even;
+        while(even && even->next) {
+            odd->next = even->next;
+            odd = odd->next;
+            even->next = odd->next;
+            even = even->next;
+        }
+        odd->next = even_head;
+        return head;
+    }
+};
+
+class SolutionT973 {
+public:
+    vector<vector<int>> kClosest(vector<vector<int>>& points, int K) {
+        priority_queue<pair<int, int>> pq;
+        for (int i = 0; i < points.size(); i++) {
+            int prod = points[i][0] * points[i][1];
+            pq.push(make_pair(prod, i));
+        }
+        vector<vector<int>> res;
+        for (int i = 0; i < K; i++) {
+            auto temp = pq.top(); pq.pop();
+            res.push_back(points[temp.second]);
+        }
+        return res;
+    }
+
+     vector<vector<int>> kClosest(vector<vector<int>>& points, int K) {
+        priority_queue<pair<int, int>> q;
+        for (int i = 0; i < K; ++i) {
+            q.emplace(points[i][0] * points[i][0] + points[i][1] * points[i][1], i);
+        }
+        int n = points.size();
+        for (int i = K; i < n; ++i) {
+            int dist = points[i][0] * points[i][0] + points[i][1] * points[i][1];
+            if (dist < q.top().first) {
+                q.pop();
+                q.emplace(dist, i);
+            }
+        }
+        vector<vector<int>> ans;
+        while (!q.empty()) {
+            ans.push_back(points[q.top().second]);
+            q.pop();
+        }
+        return ans;
+    }
+};
+
+class SolutionT1024 {
+public:
+    int videoStitching(vector<vector<int>>& clips, int T) {
+        sort(clips.begin(), clips.end(), [](vector<int> a, vector<int> b){
+            return a[0] < b[0] ? true:(a[0]==b[0]?a[1] < b[1]:false);
+        });
+        int start = 0, res = 0;
+        while(clips[start][0] == 0) start++;
+        if (start > 0) start = start - 1;
+        int cur_end = clips[start][1];
+        for (int i = start + 1; i < clips.size(); i++) {
+            if (clips[i][0] > cur_end) {
+                return -1;
+            }
+            int temp_end = clips[i][1];
+            while(clips[i][0] <= cur_end) {
+                temp_end = max(temp_end, clips[i][1]);
+                i++;
+            }
+            res++;
+            cur_end = temp_end;
+        }
+        return res;
+    }
+
+    int videoStitching(vector<vector<int>>& clips, int T) {
+        sort(clips.begin(), clips.end(), [](vector<int> a, vector<int> b){
+            return a[0] < b[0] ? true:(a[0]==b[0]?a[1] < b[1]:false);
+        });
+        if(T==0) return 0;
+        if(clips[0][0] > 0) return -1;
+        //sort(clips.begin(), clips.end());
+        int start = 0, res = 1;
+        while(start < clips.size() && clips[start+1][0] == 0) start++;
+        int cur_end = clips[start][1];
+        int i = start + 1;
+        for (; i < clips.size(); i++) {
+            if(cur_end >= T) break;
+            if (clips[i][0] > cur_end) {
+                return -1;
+            }
+            int temp_end = clips[i][1];
+            while(i < clips.size() && clips[i][0] <= cur_end) {
+                temp_end = max(temp_end, clips[i][1]);
+                i++;
+            }
+            i = i - 1;
+            res++;
+            cur_end = temp_end;
+        }
+        return (cur_end >= T) ? res:-1;
+        //return cur_end;
+    }
+
+    //dp
+    int videoStitching(vector<vector<int>>& clips, int T) {
+        vector<int> dp(T + 1, INT_MAX - 1);
+        dp[0] = 0;
+        for (int i = 1; i <= T; i++) {
+            for (auto &it:clips) {
+                if (it[0] < T && it[1] >= T) {
+                    dp[i] = min(dp[i], dp[it[0]] + 1);
+                }
+            }
+        }
+        return dp[T] == INT_MAX - 1 ? -1 : dp[T];
+    }
+
+    //用一两个变量来存储cur-end，temp-end
+    //用一个数组来存储当前位置可以到达的最远
+    int videoStitching(vector<vector<int>>& clips, int T) {
+        vector<int> dist(T+1);
+        dist[0] = 0;
+        for (vector<int>& it : clips) {
+            if (it[0] < T) {
+                dist[it[0]] = max(dist[it[0]], it[1]);
+            }
+        }
+        int step = 0, reach = 0, i = 0, res = 0;
+        while (reach < T) {
+            int pre = reach;
+            for (; i <= pre; i++) {
+                reach = max(reach, dist[i]);
+            }
+            res++;
+            if (reach <= pre) return -1;
+        }
+        return res;
+    }
+};
+
+class SolutionT778 {
+public:
+    int swimInWater(vector<vector<int>>& grid) {
+        int res = 0, n = grid.size();
+        unordered_set<int> visited{0};
+        vector<vector<int>> dirs{{0, -1}, {-1, 0}, {0, 1}, {1, 0}};
+        auto cmp = [](pair<int, int>& a, pair<int, int>& b) {return a.first > b.first;};
+        priority_queue<pair<int, int>, vector<pair<int, int>>, decltype(cmp) > q(cmp);
+        q.push({grid[0][0], 0});
+        //存放的是高度，坐标
+        while(!q.empty()) {
+            auto temp = q.top();
+            int x = temp.second / n, y = temp.second % n;
+            res = max(res, grid[x][y]);
+            //每次取最大，表示通过BFS遍历到当前最小位置需要等待的时间
+            if (x == n-1 && y == n-1) return res;
+            for (auto dir : dirs) {
+                int x = x + dir[0], y = y + dir[1];
+                if (x < 0 || x >= n || y < 0 || y >= n || visited.count(x * n + y)) continue;
+                visited.insert(x * n + y);
+                q.push({grid[x][y], x * n + y});
+            }
+        }
+        return res;
+    }
+};
+
+class SolutionT324 {
+public:
+    void wiggleSort(vector<int>& nums) {
+        priority_queue<int, vector<int>, less<int> > maxheap; //maxheap; 存放较小的数
+        priority_queue<int, vector<int>, greater<int> > minheap; //minheap; 存放较大的数
+        priority_queue<int, vector<int>, less<int> > temp_maxheap;
+        int n = nums.size();
+        int maxheap_size = (n + 1)/2, minheap_size = n - maxheap_size;
+        for (int i = 0; i < n; i++) {
+            maxheap.push(nums[i]);
+            minheap.push(nums[i]);
+            if (maxheap.size() > maxheap_size) maxheap.pop();
+            if (minheap.size() > minheap_size) minheap.pop();
+        }
+        while(!minheap.empty()) {
+            int temp = minheap.top(); minheap.pop();
+            temp_maxheap.push(temp);
+        }
+        for (int i = 0; i < n; i++) {
+            if (i%2 == 0) {
+                nums[i] = maxheap.top(); maxheap.pop();
+            } else {
+                nums[i] = temp_maxheap.top(); temp_maxheap.pop();
+            }
+        }
+    }
+
+    void wiggleSort(vector<int>& nums) {
+        vector<int> tmp = nums;
+        int n = nums.size(), k = (n + 1) / 2, j = n; 
+        sort(tmp.begin(), tmp.end());
+        for (int i = 0; i < n; ++i) {
+            nums[i] = i & 1 ? tmp[--j] : tmp[--k];
+        }
+    }
+};
+
+class SolutionT347 {
+public:
+    vector<int> topKFrequent(vector<int>& nums, int k) {
+        unordered_map<int, int> map;
+        for (const auto &num:nums) map[num]++;
+        auto cmp = [](const pair<int, int> &a, const pair<int, int> &b){
+            return a.first < b.first;
+        } //less maxheap
+        priority_queue<pair<int, int>, vector<pair<int,int> >, decltype(cmp)> pq(cmp);
+        for (auto it:map) {
+            pq.push(make_pair(it.second, it.first));
+        }
+        vector<int> res;
+        for (int i = 0; i < k; i++) {
+            auto temp = pq.top(); pq.pop();
+            res.push_back(temp->second);
+        }
+        return res;
+    }
+};
+
+class SolutionT567 {
+public:
+    bool checkInclusion(string s1, string s2) {
+        unordered_map<int, int> map;
+        for (auto s:s1) map[s]++;
+        int count = s1.size();
+        int left = 0;
+        unordered_map<int, int> temp_map = map;
+        for (int i = 0; i < s2.size(); i++) {
+            if (temp_map.find(s2[i]) != temp_map.end()) {
+                if (temp_map[s2[i]] > 0) {
+                    count--; temp_map[s2[i]]--;
+                }
+                if (count == 0) return true;
+            } else{
+                left = i + 1;
+                temp_map = map;
+                count = 0;
+                continue;
+            }
+        }
+        return false;
+    }
+};
+
+class SolutionT1143 {
+public:
+    int longestCommonSubsequence(string text1, string text2) {
+        int s1 = text1.size(), s2 = text2.size();
+        vector<vector<int> > dp(s1 + 1, vector<int> (s2 + 1, 0));
+        for (int i = 1; i <= s1; i++) {
+            for (int j = 1; j <= s2; j++) {
+                if (text1[i - 1] == text2[j - 1]) dp[i][j] = dp[i-1][j-1] + 1;
+                else dp[i][j] = max(dp[i-1][j], dp[i][j-1]);
+            }
+        }
+        return dp[s1][s2];
+    }
+};
+
+class SolutionT617 {
+public:
+    TreeNode* mergeTrees(TreeNode* t1, TreeNode* t2) {
+        if (!t1 && !t2) return nullptr;
+        if (!t1 || !t2) return t1?t1:t2;
+        TreeNode* newNode = new TreeNode(t1->val + t2->val);
+        newNode->left = mergeTrees(t1->left, t2->left);
+        newNode->right = mergeTrees(t1->right, t2->right);
+        return newNode;
+    }
+};
+
+class Solution662 {
+public:
+    int widthOfBinaryTree(TreeNode* root) {
+        queue<TreeNode*> q({root});
+        int res = 1;
+        while(!q.empty()){
+            TreeNode* node = q.front();
+            while(node == nullptr) {
+                q.pop(); node = q.front();
+            }
+            int qSize = q.size(), lastIndex = 0;
+            for (int i = 0; i < qSize; i++) {
+                if (node) {
+                    lastIndex = i;
+                    q.push(node->left);
+                    q.push(node->right);
+                } else {
+                    q.push(nullptr);
+                    q.push(nullptr);
+                }
+            }
+            res = max(res, lastIndex + 1);
+        }
+        return res;
+    }
+
+    //bfs 为什么不去管空节点呢，因为父节点是空，肯定不会有字节点，即使空父节点后面
+    //还有节点，但是这个空姐点的子节点都是用来充数的，非空父节点有pos，子节点有相应更大的pos
+    int widthOfBinaryTree(TreeNode* root) {
+        queue<PosNode*> q;
+        q.push(new TreeNode(root, 0, 0));
+        int left = 0, ans = 0, curDepth = 0;
+        while(!q.empty()) {
+            auto temp = q.front();
+            if (temp->node != nullptr) {
+                q.push(new PosNode(temp->left, temp->depth + 1, temp->pos*2));
+                q.push(new PosNode(temp->right, temp->depth + 1, temp->pos*2 + 1));
+            }
+            if (curDepth != temp->depth) {
+                curDepth = temp->depth;
+                left = temp->pos;
+            }
+            ans = max(ans, temp->pos - left + 1);
+        }
+    }
+
+    //dfs
+    int ans = 0;
+    unordered_map<int, int> map;
+    int widthOfBinaryTree(TreeNode* root) {
+        dfs(root, 0, 0);
+    }
+
+    void dfs(TreeNode* node, int depth, int pos) {
+        if (!node) return;
+        if (map.count(depth) == 0) {
+            map[depth] = pos;
+        }
+        ans = max(ans, pos - map[depth]);
+        dfs(node->left, depth + 1, 2 * pos);
+        dfs(node->right, depth + 1, 2 * pos + 1);
+    }
+};
+
+class PosNode{
+    TreeNode node;
+    int depth, pos;
+    PosNode(TreeNode n, int d, int p){
+        node = n;
+        depth = d;
+        pos = p;
+    }
+}
+
+class SolutionT315 {
+public:
+    vector<int> countSmaller(vector<int>& nums) {
+        vector<int> temp, res(nums.size());
+        for (int i = nums.size() - 1; i >= 0; i++) {
+            int l = 0, r = temp.size();
+            while (l < r) {
+                int mid = l + (r - l) / 2;
+                if (temp[mid] < nums[i]) left = mid + 1;
+                else right = mid;
+            }
+            res[i] = right; 
+            temp.insert(temp.begin() + right, nums[i]);
+        }
+        return res;
+    }
+};
+
+class SolutionT1373 {
+public:
+    int findMin(TreeNode* root) {
+        if (!root) return INT_MAX;
+        while(root->left) {
+            root = root->left;
+        }
+        return root->val;
+    }
+
+    int findMax(TreeNode* root) {
+        if (!root) return INT_MIN;
+        while(root->right) {
+            root = root->right;
+        }
+        return root->val;
+    }
+
+    bool searchBST(TreeNode* root, int &maximum, int &cursum) {
+        if (!root) {
+            cursum = 0;
+            return true;
+        }
+        int leftsum = 0;
+        bool isLeft = searchBST(root->left, maximum, leftsum);
+        int rightsum = 0;
+        bool isRight = searchBST(root->right, maximum, rightsum);
+        if(isLeft && isRight){
+            int minVal = findMin(root->right);
+            int maxVal = findMax(root->left);
+            if (root->val > maxVal && root->val < minVal) {
+                cursum = root->val + leftsum + rightsum;
+                maximum = max(maximum, cursum);
+            }
+            return true;
+        }
+        cursum = 0;
+        return false;
+    }
+
+    int maxSumBST(TreeNode* root) {
+        if (!root) return 0;
+        int maxium = 0, cursum = 0;
+        searchBST(root, maxium, cursum);
+        return maximum;
+    }
+};
+

@@ -341,6 +341,25 @@ public:
 
 class SolutionT644 {
 public:
+//brute-force
+    double findMaxAverage(vector<int>& nums, int k) {
+        int n = nums.size();
+        vector<int> sums = nums;
+        for (int i = 1; i < n; ++i) {
+            sums[i] = sums[i - 1] + nums[i];
+        }
+        double res = (double)sums[k-1] / k;
+        for (int i = k; i < n - k + 1; i++) {
+            double t = sums[i];
+            if (t > res * (i + 1)) res = t / (i + 1);
+            for (int j = i - k; j >= 0; j--) {
+                t = sum[i] -sum[j];
+            }
+            if (t > res * (i - j)) res = t / (i - j);
+        }
+        return res;
+    }
+
 //平均值的最大最小范围就是数组中值的最大值和最小值
     double findMaxAverage(vector<int>& nums, int k) {
         int n = nums.size();
@@ -353,11 +372,70 @@ public:
             for (int i = 1; i < n; i++) {
                 sums[i] = sums[i-1] + nums[i-1] - mid;
                 if (i >= k) minSum = min(minSum, sums[i-k]);
-                if (i >= k && sums[i] > minSum) {check=true; break};
+                if (i >= k && sums[i] - minSum> 0) {check=true; break}; //表明（每个数-中位数）的的累加和
+                // > 0，即这个长度大于k的子数组，他的平均值比mid大
             }
             if (check) left = mid + 1;
             else right = mid;
         }
         return left;
+    }
+};
+
+class SolutionT287 {
+public:
+    //有最大最小值范围，折半方法为计数
+    int findDuplicate(vector<int>& nums) {
+        int left = 1, right = nums.size();
+        while (left < right){
+            int mid = left + (right - left) / 2, cnt = 0;
+            for (int num : nums) {
+                if (num <= mid) ++cnt;
+            }
+            if (cnt <= mid) left = mid + 1;
+            else right = mid;
+        }    
+        return right;
+    }
+
+    //快慢指针成环原理
+    int findDuplicate(vector<int>& nums) {
+        int slow = 0, fast = 0, t = 0;
+        while(true) {
+            slow = nums[slow];
+            fast = nums[nums[fast]];
+            if (slow == fast) break;
+        }
+        while(true) {
+            slow = nums[slow];
+            t = nums[t];
+            if (slow == t) break;
+        }
+        return slow;
+    }
+};
+
+class Solution {
+public:
+    int canCompleteCircuit(vector<int>& gas, vector<int>& cost) {
+        vector<int> gas_sum = gas, cost_sum = cost;
+        for (int i = 1; i < gas.size(); i++) {
+            gas_sum[i] += gas_sum[i-1];
+            cost_sum[i] += cost_sum[i-1];
+        }
+        int res = gas.size() - 1;
+        if (gas_sum.back() < cost_sum.back()) return -1;
+        for (int i = gas.size() - 1; i >= 0; i--) {
+            if (gas_sum[i] < cost_sum[i]) break;
+            res = i;
+        }
+        return res;
+    }
+};
+
+class SolutionT778 {
+public:
+    int swimInWater(vector<vector<int>>& grid) {
+
     }
 };

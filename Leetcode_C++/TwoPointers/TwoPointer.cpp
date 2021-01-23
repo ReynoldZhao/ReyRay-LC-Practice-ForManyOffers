@@ -74,3 +74,50 @@ public:
         return res;
     }
 };
+
+class SolutionT287 {
+public:
+    int findDuplicate(vector<int>& nums) {
+        int temp = nums[0], n = nums.size(), res = nums[0];
+        for (int i = 1; i < n; i++) {
+            temp = temp ^ nums[i];
+            if (!temp) {
+                res = nums[i];
+                break;
+            }
+        }
+        return res;
+    }
+};
+
+class SolutionT713 {
+public:
+//这其实是一种brute-force的双指针
+    int numSubarrayProductLessThanK(vector<int>& nums, int k) {
+        int res = 0, left = 0, right = 0, accum = 1, n = nums.size();
+        for (int i = 0; i < n; i++) {
+            int right = i, accum = 1;
+            // 向右
+            while (right < n && accum * nums[right] < k) {
+                accum = accum * nums[right];
+                right++;
+                res++;
+            }
+        }
+        return res;
+    }
+
+    int numSubarrayProductLessThanK(vector<int>& nums, int k) {
+        int left = 0, prod = 1, n = nums.size(), res = 0;
+        for (int i = 0; i < n; i++) {
+            prod = prod * nums[i];
+            //向左
+            while (left <= i && prod >= k) prod /= nums[left++];
+            res += i - left + 1; //left --- i 中的每一个子数组 + 新遍历到i，即为新增子数组个数。
+            //这个子数组个数新增真的很巧
+            // 4 5 6 7 --- 8    87 876 8765 87654
+            //只考虑当前的状态
+        }
+        return res;
+    }
+};

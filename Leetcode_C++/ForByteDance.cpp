@@ -13,6 +13,7 @@
 #include <unordered_set>
 #include <hash_map>
 #include <deque>
+#include <memory>
 using namespace std;
 
 //反转链表
@@ -32,7 +33,7 @@ public:
     ListNode* reverseList(ListNode* head) {
         ListNode* pre = nullptr;
         ListNode* cur = head;
-        while(head!=nullptr) {
+        while(cur!=nullptr) {
             ListNode* nextTemp = cur->next;
             cur->next = pre;
             pre = cur;
@@ -131,6 +132,38 @@ private:
     int cap;
     list<pair<int, int>> l;
     unordered_map<int, pair<int,int>> m;
+};
+
+class LRUCache{
+public:
+    LRUCache(int capacity) {
+        cap = capacity;
+    }
+    
+    int get(int key) {
+        auto it = map.find(key);
+        if (it == map.end()) return -1;
+        l.splice(l.begin(), l, map[key]);
+        return map[key].second;
+    }
+    
+    void put(int key, int value) {
+        auto it = map.find(key);
+        if (it!=map.end()) l.erase(map[key]);
+        l.push_front(make_pair<key, val>);
+        m[key] = l.begin();
+        if (m.size() > cap) {
+            int k = l.rebegin()->first;
+            l.pop_back();
+            map.erase(k);
+        }
+
+    }
+    
+private:
+    int cap;
+    list<pair<int, int>> l; //k-v
+    unordered_map<int, list<pair<int, int> >::iterator> map;
 };
 
 //最长无重复子串
@@ -233,7 +266,8 @@ public:
 class SolutionT394 {
 public:
     string decodeString(string s) {
-        return decode(s, 0);
+        int i = 0;
+        return decode(s, i);
     }
 
     string decode(string s, int index) {
@@ -247,9 +281,9 @@ public:
                 while (s[index] >= '0' && s[index] <= '9') {
                     cnt = cnt*10 + s[index++] - '0';
                 }
-                i++;//左括号
+                index++;//左括号
                 string temp = decode(s, index);
-                i++;//右括号 这两个i++就是精髓
+                index++;//右括号 这两个i++就是精髓
                 while(cnt>0) {
                     cnt--;
                     res.append(temp);
@@ -391,6 +425,23 @@ private:
     Singleton() {}
     static Singleton* p;
     static pthread_mutex_t mutex;
+};
+
+class Singleton{
+public:
+    static Singleton* getInstance() {
+        if (p == nullptr) {
+            lock(mutex);
+            if (p == nullptr) {
+                p = new Singleton();
+            }
+            unlock(mutex);
+        }
+    }
+private:
+    Singleton() {}
+    static Singleton* p;
+    static pthread_mutex_t mutex;
 }
 
 
@@ -412,7 +463,7 @@ Singleton* Singleton:: p = new Singleton();
 int **a;
 a = new int*[M];    
 for(int i = 0;i < M; i++)    
-    p[i] = new int[N];    
+    a[i] = new int[N];    
 
 //释放
 for(int i=0;i<M;i++) 
@@ -791,4 +842,290 @@ int main() {
 	t2.join();
 	cout<<"main here"<<endl;  //要t1线程、t2线程都执行完毕后才会执行
 	return 0;
+}
+
+struct ListNode {
+      int val;
+      struct ListNode *next;
+      ListNode(int x) :
+            val(x), next(NULL) {
+      }
+};
+
+//智能指针
+
+*(*(a+m)+n)
+void bar(unique_ptr<ListNode> li){
+
+}
+
+void foo() {
+    auto e = std::make_unique<
+}
+
+void swap(int &a, int &b) {
+    a = a + b;
+    b = a - b;
+    a = a - b;
+
+    a = a ^ b;
+    b = a ^ b;
+    a = a ^ b;
+}
+
+class Solution {
+public:
+    Node* head = NULL;
+    Node* pre = NULL;
+    Node* treeToDoublyList(Node* root) {
+        if (!root) return nullptr;
+        stack<Node*> st;
+        Node* root = p;
+        while(p || !st.empty()) {
+            while(p) {
+                st.push_back(p);
+                p = p->left;
+            }
+            p = st.top(); st.pop();
+            if (!pre) {
+                pre = st.top();
+                head = pre;
+            }
+            else {
+                pre->right = p;
+                p->left = pre;
+                pre = pre->right;
+            }
+            p = p->right;
+        }
+    }
+};
+
+class Date
+{
+public:
+	Date(int year = 2017, int month = 9, int day = 10)
+		: _year(year)
+		, _month(month)
+		, _day(day)
+	{}
+	void Display();    //显示函数
+	void SetDate();    //获取日期函数
+	void AddDate();    //日期加一函数
+	void SubDate();    //日期减一函数
+	
+ 
+	Date& operator=(const Date& d);    //赋值
+	Date& operator++();      // 前置++ 
+	Date operator++(int);    // 后置++ 
+	Date& operator--();      //前置--
+	Date operator--(int);    //后置-- 
+	Date operator+(int days);  //days天之后的日期  
+	Date operator-(int days);  // days天之前的日期
+ 
+	int operator-( Date& d);                    // 两个日期之间的距离 （方式一）
+	friend int SubDateDays(Date &x,Date &y);    // (方式二)两个日期之间的距离 
+ 
+	bool operator==(const Date& d);
+	bool operator!=(const Date& d);
+	bool operator>(const Date& d);
+	bool operator<(const Date& d);
+ 
+public:
+	int _year;
+	int _month;
+	int _day;
+};
+
+
+//智能指针的线程安全问题
+// 1.演示引用计数线程安全问题，就把AddRefCount和SubRefCount中的锁去掉
+// 2.演示可能不出现线程安全问题，因为线程安全问题是偶现性问题，main函数的n改大一些概率就变大了，就容易出现了。
+// 3.下面代码我们使用SharedPtr演示，是为了方便演示引用计数的线程安全问题，将代码中的SharedPtr换成sshared_ptr
+//进行测试，可以验证库的shared_ptr，发现结论是一样的。
+void SharePtrFunc(shared_ptr<Date>& sp, size_t n) {
+    cout << sp.get() << endl;
+    for (size_t i = 0; i < n; ++i) {
+        shared_ptr<Date> copyPtr(sp);
+        copyPtr->_year++;
+        copyPtr->_month++;
+        copyPtr->_day++;
+    }
+}
+
+int main() {
+    shared_ptr<Date> p(new Date);
+    cout << p.get() << endl;
+    const size_t n = 100;
+    thread t1(SharePtrFunc, p, n);
+    thread t2(SharePtrFunc, p, n);
+    t1.join();
+    t2.join();
+    cout << p->_year << endl;
+	cout << p->_month << endl;
+	cout << p->_day << endl;
+	return 0;
+}
+
+//shared_ptr 循环引用
+class B;
+class A {
+public:
+    shared_ptr<B> ptr; 
+   // weak_ptr<B> ptr;
+};
+
+class B {
+public:
+    shared_ptr<A> ptr;
+    //weak_ptr<A> ptr;
+};
+
+int main() {
+    while (true)
+    {   // A aObject = new A();
+        // pa 指向 aObject pb->ptr 指向aObject
+        // B bObject = new B();
+        // pb 指向 aObject pa->ptr 指向aObject
+        shared_ptr<A> pa(new A());
+        shared_ptr<B> pb(new B());
+        pa->ptr = pb;
+        pb->ptr = pa;
+    }
+// class A和class B的对象各自被两个智能指针管理，也就是A object和B object引用计数都为2，为什么是2？
+
+// 分析class A对象的引用情况，该对象被main函数中的pa和class B对象中的ptr管理，因此A object引用计数是2，
+// B object同理。
+
+// 在这种情况下，在main函数中一个while循环结束的时候，pa和pb的析构函数被调用，但是class A对象和class B对象
+// 仍然被一个智能指针管理，
+// A object和B object引用计数变成1，于是这两个对象的内存无法被释放，造成内存泄漏，
+}
+
+//循环引用
+struct ListNode{
+    int _data;
+    shared_ptr<ListNode> _prev;
+    shared_ptr<ListNode> _next;
+    ~ListNode(){ cout << "~ListNode()" << endl; }
+}
+
+int main() {
+    shared_ptr<ListNode> node1(new ListNode);
+    shared_ptr<ListNode> node2(new ListNode);
+    node1->_next = node2;
+	node2->_prev = node1;
+// node1和node2两个智能指针对象指向两个节点，引用计数变为1，我们不需要手动delete
+// node1的_next指向node2，node2的_prev指向node1，引用计数变成2
+// node1和node2析构，引用计数减到1，但是_next还指向下一个节点，_prev指向上一个节点
+// 也就是说_next析构了，node2释放了
+// 也就是说_prev析构了，node1释放了
+// 但是_next属于node的成员，node1释放了，_next才会析构，而node1由_prev管理，_prev属于node2成员，
+// 所以这就叫循环引用，谁都不会释放
+}
+
+#include <iostream>       // std::cout
+#include <chrono>         // std::chrono::milliseconds
+#include <thread>         // std::thread
+#include <mutex>          // std::mutex
+
+std::mutex foo, bar;
+
+void task_a() {
+    std::lock(foo, bar);
+    std::unique_lock<std::mutex> lck1(foo, std::adopt_lock);
+    std::unique_lock<std::mutex> lck2(bar, std::adopt_lock);
+    std::cout << "task a\n";
+}
+
+void task_b() {
+	// foo.lock(); bar.lock(); // replaced by:
+	std::unique_lock<std::mutex> lck1, lck2;
+	lck1 = std::unique_lock<std::mutex>(bar, std::defer_lock);
+	lck2 = std::unique_lock<std::mutex>(foo, std::defer_lock);
+	std::lock(lck1, lck2);       // simultaneous lock (prevents deadlock)
+	std::cout << "task b\n";
+	// (unlocked automatically on destruction of lck1 and lck2)
+}
+
+struct bank_account{
+    explicit bank_account(string name, int money)
+    {
+        sName = name;
+        iMoney = money;
+    }
+
+    string sName;
+    int iMoney;
+    mutex mMutex;//账户都有一个锁mutex 
+};
+
+void transfer(bank_account &from, bank_account &to, int amount)//这里缺少一个from==to的条件判断个人觉得  
+{
+    unique_lock<mutex> lock1(from.mMutex, defer_lock);//defer_lock表示延迟加锁，此处只管理mutex  
+    unique_lock<mutex> lock2(to.mMutex, defer_lock);
+    lock(lock1, lock2);//lock一次性锁住多个mutex防止deadlock,这个是关键  
+    from.iMoney -= amount;
+    to.iMoney += amount;
+    cout << "Transfer " << amount << " from " << from.sName << " to " << to.sName << endl;
+}
+
+void main()
+{
+    bank_account Account1("User1", 100);
+    bank_account Account2("User2", 50);
+    thread t1([&](){ transfer(Account1, Account2, 10)}; );
+    thread t2([&]() { transfer(Account2, Account1, 5); });
+    t1.join();
+    t2.join();
+
+    system("pause");
+}
+
+
+
+//生产者消费者
+#include <iostream>           
+#include <queue>
+#include <thread>             
+#include <mutex> 
+#include <unistd.h>             
+#include <condition_variable> 
+
+mutex m;
+condition_variable cond;
+int flag = 0;
+void producer() {
+    this_thread::sleep_for(chrono::seconds(1)); //sleep(1);
+    lock_guard<mutex> guard(m);
+    flag = 100;
+    cond.notify_one();
+    cout << "notify..." << endl;
+}
+void customer() {
+    unique_lock<mutex> lk(m);
+    if (m.try_lock())
+        cout << "mutex unlocked after unique_lock" << endl;
+    else
+        cout << "mutex locked after unique_lock" << endl;//输出  
+    while (flag == 0) {
+        cout << "wait..." << endl;
+        cond.wait(lk);
+    }
+    if (m.try_lock())
+        cout << "mutex unlocked after wait" << endl;
+    else
+        cout << "mutex locked after wait" << endl;//输出 
+    flag--; 
+    cout << "flag==100? " << flag << endl;
+}
+
+int main() {
+    thread one(producer);
+    thread two(customer);
+    one.join();
+    two.join();
+
+    system("pause");
+    return 0;
 }
