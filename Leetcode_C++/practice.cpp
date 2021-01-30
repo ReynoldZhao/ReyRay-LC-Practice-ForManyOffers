@@ -1884,22 +1884,52 @@ public:
 class SolutionT567 {
 public:
     bool checkInclusion(string s1, string s2) {
+        int n1 = s1.size(), n2 = s2.size();
+        vector<int> m1(128), m2(128);
+        for (int i = 0; i < n1; ++i) {
+            ++m1[s1[i]]; ++m2[s2[i]];
+        }
+        for (int i = n1; i < n2; i++) {
+            ++m2[s2[i]];
+            --m2[s2[i - n1]];
+            if (m1 == m2) return true;
+        }
+        return false;
+    }
+
+    bool checkInclusion(string s1, string s2) {
+        int n1 = s1.size(), n2 = s2.size(), left = 0;
+        vector<int> m(128);
+        for (char c : s1) ++m[c];
+        for (int right = 0; right < n2; ++right) {
+            if (--m[s2[right]] < 0) {
+                while (++m[s2[left++]] != 0) {}
+            } else if (right - left + 1 == n1) return true;
+        }
+        return n1 == 0;
+    }
+    
+    bool checkInclusion(string s1, string s2) {
+        int n1 = s1.size(), n2 = s2.size(), left = 0, count = n1;
         unordered_map<int, int> map;
-        for (auto s:s1) map[s]++;
-        int count = s1.size();
-        int left = 0;
-        unordered_map<int, int> temp_map = map;
-        for (int i = 0; i < s2.size(); i++) {
-            if (temp_map.find(s2[i]) != temp_map.end()) {
-                if (temp_map[s2[i]] > 0) {
-                    count--; temp_map[s2[i]]--;
+        unordered_map<int, int> temp_map;
+        for (char c : s1) ++map[c];
+        temp_map = map;
+        for (int i = 0; i < s2; i++) {
+            if (map.find(s2[i]) != map.end()) {
+                map[s2[i]]--; count--;
+                if (map[s2[i]] < 0) {
+                    while(map[s2[i]] < 0) {
+                        map[s2[left]]++;
+                        left++;
+                        count++;
+                    }
                 }
                 if (count == 0) return true;
-            } else{
+            }
+            else {
                 left = i + 1;
-                temp_map = map;
-                count = 0;
-                continue;
+                map = temp_map;
             }
         }
         return false;
@@ -2073,3 +2103,185 @@ public:
     }
 };
 
+
+class SolutionT1405 {
+public:
+    string longestDiverseString(int a, int b, int c) {
+        priority_queue<pair<int, char>> pq;
+        if(a) pq.push({a,'a'});
+        if(b) pq.push({b,'b'});
+        if(c) pq.push({c,'c'});
+        string ans="";
+        while(pq.size() > 1) {
+            pair<int,char> one = pq.top();pq.pop();
+            pair<int,char> two = pq.top();pq.pop();
+        }
+        if(one.first>=2){
+                ans+=one.second;
+                ans+=one.second;
+                one.first-=2;
+            }
+            else{
+                ans+=one.second;
+                one.first-=1;
+            }
+            if(two.first>=2 && two.first>=one.first){
+                ans+=two.second;
+                ans+=two.second;
+                two.first-=2;
+            }
+            else{
+                ans+=two.second;
+                two.first-=1;
+            }
+            if(one.first>0)
+                pq.push(one);
+            if(two.first>0)
+                pq.push(two);
+    }
+};
+
+class SolutionT813 {
+public:
+    //动态规划的基础 递归
+    double largestSumOfAverages(vector<int>& A, int K) {
+        int n = A.size();
+        double sum = 0.0, res = 0.0;
+        if (K == 1) {
+            for (int i = 0; i <= n - K; i++) {
+                sum += A[i];
+            }
+            return sum/n;
+        } else {
+            for (int i = 0; i <= n - K; i++) {
+                sum += A[i];
+                double temp = sum/(i+1)+helper(A, i + 1, K - 1); 
+                res = max(temp, res);
+            }
+        }
+        return res;
+    }
+
+    double helper(vector<int>& A, int index, int k) {
+        int n = A.size();
+        if (index >= n || k == 0) return 0;
+        if (k == 1 && index < n) {
+            double tempSum = 0.0;
+            for (int i = index; i < n; i++) {
+                tempSum += A[i];
+            }
+            return tempSum/(n - index);
+        }
+        double sum = 0.0, res = 0.0;
+        for (int i = index; i <= n - k; i++) {
+            sum += A[i];
+            double temp = sum/(i-index+1)+helper(A, i + 1, k - 1); 
+            res = max(temp, res);
+        }
+        return res;
+    }
+
+    //记忆化的递归，动态规划
+    //dp[i][k]表示范围是[i, n-1]的子数组分成k组的最大得分
+    double largestSumOfAverages(vector<int>& A, int K) {
+        int n = A.size();
+        vector<vector<double>> dp(n, vector<double>(K,0));
+        vector<double> sum(n+1);
+        for (int i = 1; i < n; i++) {
+            sum[i]  += (sum[i - 1] + A[i]);
+        }
+        for (int i = 0; i < n; i++) {
+            dp[i][0] = (sum[n] - sum[i]) / (n-i);
+        }
+        for (int k = 1; k < K; k++) {
+            for (int i = 0; i < n; i++) {
+                for (int j = i + 1; j < n; j++) {
+                    dp[i][k] = max(dp[i][k], (sum[j] - sum[i]) / (j - i) + dp[j][k-1]);
+                }
+            }
+        }
+        return dp[0][K-1];
+    }
+};
+
+
+class SolutionT163 {
+public:
+    int maximumGap(vector<int>& nums) {
+        
+    }
+};
+
+class SolutionT409 {
+public:
+    int longestPalindrome(string s) {
+        int res = 0;
+        bool mid = false;
+        unordered_map<char, int> m;
+        for (char c : s) ++m[c];
+        for (auto it = m.begin(); it != m.end(); ++it) {
+            res += it->second;
+            if (it->second % 2 == 1) {
+                res -= 1;
+                mid = true;
+            } 
+        }
+        return mid ? res + 1 : res;
+    }
+};
+
+class SolutionT207 {
+public:
+    bool canFinish(int numCourses, vector<vector<int>>& prerequisites) {
+        vector<vector<int>> graph(numCourses, vector<int>());
+        vector<int> in(numCourses);
+        for (auto a : prerequisites) {
+            graph[a[1]].push_back(a[0]);
+            ++in[a[0]];
+        }
+        queue<int> q;
+        for (int i = 0; i < numCourses; ++i) {
+            if (in[i] == 0) q.push(i);
+        }
+        while (!q.empty()) {
+            int t = q.front(); q.pop();
+            for (auto a : graph[t]) {
+                --in[a];
+                if (in[a] == 0) q.push(a);
+            }
+        }
+        for (int i = 0; i < numCourses; ++i) {
+            if (in[i] != 0) return false;
+        }
+        return true;
+    }
+};
+
+class SolutionT210 {
+public:
+    vector<int> findOrder(int numCourses, vector<vector<int>>& prerequisites) {
+        vector<vector<int>> graph(numCourses, vector<int>());
+        vector<int> in(numCourses);
+        vector<int> path;
+        for (auto a : prerequisites) {
+            graph[a[1]].push_back(a[0]);
+            ++in[a[0]];
+        }
+        queue<int> q;
+        for (int i = 0; i < numCourses; ++i) {
+            if (in[i] == 0) q.push(i);
+        }
+        while (!q.empty()) {
+            int t = q.front(); q.pop();
+            path.push(t);
+            for (auto a : graph[t]) {
+                --in[a];
+                if (in[a] == 0) q.push(a);
+            }
+        }
+        for (int i = 0; i < numCourses; ++i) {
+            if (in[i] != 0) return {};
+        }
+        return path;
+    }
+};

@@ -409,24 +409,44 @@ private:
 Singleton* Singleton::p = nullptr;
 
 //线程安全的懒汉
-class Singleton {
+class Singleton{
 public:
-    static Singleton* getInstance() { 
+	static Singleton* getInstance() {
+		if (p == nullptr) {
+			pthread_mutex_lock(&mutex);
+			if (p == nullptr)
+				p = new Singleton();
+			ptread_mutex_unlock(&mutex);
+		}
+		return p;
+	}
+private:
+	Singleton() {
+		pthread_mutex_init(&mutex);
+	}
+	static Singleton *p;
+	static pthread_mutex_t mutex;
+};
+Singleton* Singleton::p = nullptr;
+pthread_mutex_t Singleton::mutex;
+
+class Singleton{
+public:
+    static Singleton* getInstance() {
         if (p == nullptr) {
-            pthread_mutex_lock(&mutex);
             if (p == nullptr) {
                 p = new Singleton();
             }
-            pthread_mutex_unlock(&mutex);
         }
-
+        return p;
     }
 private:
-    Singleton() {}
-    static Singleton* p;
+    Singleton() {
+        pthread_mutex_init(&mutex);
+    }
+    static Singleton *p;
     static pthread_mutex_t mutex;
-};
-
+}
 class Singleton{
 public:
     static Singleton* getInstance() {
@@ -1088,44 +1108,205 @@ void main()
 #include <iostream>           
 #include <queue>
 #include <thread>             
-#include <mutex> 
-#include <unistd.h>             
+#include <mutex>              
 #include <condition_variable> 
+using namespace std;
 
-mutex m;
-condition_variable cond;
-int flag = 0;
-void producer() {
-    this_thread::sleep_for(chrono::seconds(1)); //sleep(1);
-    lock_guard<mutex> guard(m);
-    flag = 100;
-    cond.notify_one();
-    cout << "notify..." << endl;
-}
-void customer() {
-    unique_lock<mutex> lk(m);
-    if (m.try_lock())
-        cout << "mutex unlocked after unique_lock" << endl;
-    else
-        cout << "mutex locked after unique_lock" << endl;//输出  
-    while (flag == 0) {
-        cout << "wait..." << endl;
-        cond.wait(lk);
+mutex mtx;
+condition_variable produce, consume;  // 条件变量是一种同步机制，要和mutex以及lock一起使用
+queue<int> q;     // shared value by producers and consumers, which is the critical section
+int maxSize = 20;
+
+void consumer() 
+{
+    while (true)
+    {
+        this_thread::sleep_for(chrono::milliseconds(1000));
+        unique_lock<mutex> lck(mtx);                        
+        // RAII，程序运行到此block的外面（进入下一个while循环之前），资源（内存）自动释放
+        consume.wait(lck, [] {return q.size() != 0; });     
+        // wait(block) consumer until q.size() != 0 is true 如果queue为空就阻塞 否则不阻塞
+        cout << "consumer " << this_thread::get_id() << ": ";
+        q.pop();
+        cout << q.size() << '\n';
+        produce.notify_all();                              
+        // nodity(wake up) producer when q.size() != maxSize is true 当queue不是满的时候通知
     }
-    if (m.try_lock())
-        cout << "mutex unlocked after wait" << endl;
-    else
-        cout << "mutex locked after wait" << endl;//输出 
-    flag--; 
-    cout << "flag==100? " << flag << endl;
 }
 
-int main() {
-    thread one(producer);
-    thread two(customer);
-    one.join();
-    two.join();
+void producer(int id)
+{
+    while (true)
+    {
+        this_thread::sleep_for(chrono::milliseconds(900));     
+        // producer is a little faster than consumer  
+        unique_lock<mutex> lck(mtx);
+        produce.wait(lck, [] {return q.size() != maxSize; });   
+        // wait(block) producer until q.size() != maxSize is true
+        cout << "-> producer " << this_thread::get_id() << ": ";
+        q.push(id);
+        cout << q.size() << '\n';
+        consume.notify_all();                                   
+        // notify(wake up) consumer when q.size() != 0 is true
+    }
+}
 
+int main()
+{
+    thread consumers[2], producers[2];
+    // spawn 2 consumers and 2 producers:
+    for (int i = 0; i < 2; ++i)
+    {
+        consumers[i] = thread(consumer);
+        producers[i] = thread(producer, i + 1);
+    }
+    // join them back: (in this program, never join...)
+    for (int i = 0; i < 2; ++i)
+    {
+        producers[i].join();
+        consumers[i].join();
+    }
     system("pause");
     return 0;
+}
+
+
+class SolutionT41 {
+public:
+    int firstMissingPositive(vector<int>& nums) {
+        for (int i = 0; i < nums.size(); i++) {
+            while(nums[i] != i+1) {
+                if(nums[i] <= 0 || nums[i] > nums.size() || nums[i] == nums[nums[i] - 1]) break; //两个相等
+                int temp = nums[i] - 1;
+                nums[i] = nums[temp];
+                nums[temp] = temp;
+            }
+        }
+        for (int i = 0; i < nums.size(); i++) {
+            if (nums[i] != i+1) return i+1;
+        }
+        return nums.size() + 1;
+    }
+};
+
+
+class SolutionT82 {
+public:
+    ListNode* deleteDuplicates(ListNode* head) {
+        ListNode *dummy = new ListNode(-1), *pre = dummy;
+        dummy->next = head;
+        ListNode *cur = head;
+        while(cur) {
+            if (cur->next) {
+                if (cur->val == cur->next->val) {
+                    while(cur && cur->next && cur->val == cur->next->val) {
+                        cur = cur->next;
+                    }
+                    cur = cur->next;
+                } else {
+                    pre->next = cur;
+                    cur = cur->next;
+                    pre->next->next = nullptr;
+                    pre = pre->next;
+                }
+            } else {
+                pre->next = cur;
+                cur = cur->next;
+                pre->next->next = nullptr;
+                pre = pre->next;
+            }
+        }
+        return dummy->next;
+    }
+    while(pre->next) {
+        ListNode* cur = pre->next;
+        while(cur->next && cur->next->val == cur->val) cur = cur->next;
+        if (cur != pre->next) pre->next = cur->next;
+        else pre = pre->next;
+    }
+};
+
+class SolutionT83 {
+public:
+    ListNode* deleteDuplicates(ListNode* head) {
+        if(!head) return head;
+        ListNode *cur = head, *nextNode = head->next;
+        while(nextNode){
+            while(nextNode && cur->val == nextNode->val){
+                nextNode = nextNode->next;
+            }
+            cur->next = nextNode;
+            cur = cur->next;
+            if(nextNode) nextNode = nextNode->next;
+        }
+        return head;
+    }
+};
+
+class SolutionT80 {
+public:
+    int removeDuplicates(vector<int>& nums) {
+        int curIndex = 0, n = nums.size();
+        for (int i = 0; i < nums.size(); i++) {
+            int tempIndex = i, tempVal = nums[i];
+            while(tempIndex < n && nums[tempIndex] == nums[i]) tempIndex++;
+            if (tempIndex - i >= 2) {
+                nums[curIndex++] = tempVal;
+                nums[curIndex++] = tempVal;
+            } else {
+                nums[curIndex++] = tempVal;
+            }
+            i = tempIndex - 1;
+        }
+        return curIndex;
+    }
+};
+
+class SolutionT394 {
+public:
+    string decodeString(string s) {
+        int i = 0;
+        return decode(s, i);
+    }
+    string decode(string s, int& i) {
+        string res = "";
+        int n = s.size();
+        while (i < n && s[i] != ']') {
+            if (s[i] < '0' || s[i] > '9') {
+                res += s[i++];
+            } else {
+                int cnt = 0;
+                while (s[i] >= '0' && s[i] <= '9') {
+                    cnt = cnt * 10 + s[i++] - '0';
+                }
+                ++i;
+                string t = decode(s, i);
+                ++i;
+                while (cnt-- > 0) {
+                    res += t;
+                }
+            }
+        }
+        return res;
+    }
+};
+
+class complex{
+public:
+    complex();
+    complex(double real, double imag);
+public:
+    complex operator+(const complex &A);
+private:
+    double m_real;
+    double m_img;
+}
+complex::complex(): m_real(0.0), m_img(0.0){}
+complex::complex(double real, double imag): m_real(real), m_img(imag) {}
+//运算符重载
+complex complex()::operator+(const complex &A) {
+    complex B;
+    B.m_real = this->m_real + A.m_real;
+    B.m_imag = this->m_imag + A.m_imag;
+    return B;
 }

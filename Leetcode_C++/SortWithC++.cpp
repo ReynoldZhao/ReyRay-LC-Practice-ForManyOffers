@@ -71,7 +71,7 @@ void swap(int &a, int &b) {
 
 void bubbleSort(vector<int> &arr) {
     for (int i = 0; i < arr.size() - 1; i++) {
-        for (int j = i; j  < arr.size() - 1; j++) {
+        for (int j = 0; j  < arr.size() - i - 1; j++) {
             if (arr[j] > arr[j+1]) {
                 swap(arr[j], arr[j+1]);
             }
