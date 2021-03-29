@@ -2285,3 +2285,465 @@ public:
         return path;
     }
 };
+
+class SolutionT417 {
+public:
+    vector<vector<int>> pacificAtlantic(vector<vector<int>>& matrix) {
+        vector<vector<int>> res;
+        if (matrix.empty() || matrix[0].empty()) return res;
+        int m = matrix.size(), n = matrix[0].size();
+        vector<vector<bool> > pacific(m, vector<bool> (n, false)), atlantic = pacific;
+        queue<vector<int>> q1, q2;
+        for (int i = 0; i < m; i++) {
+            q1.push({i, 0});
+            q2.push({i, n-1});
+            pacific[i][0] = true;
+            atlantic[i][n-1] = true;
+        }
+        for (int i = 0; i < n; ++i) {
+            q1.push({0, i});
+            q2.push({m - 1, i});
+            pacific[0][i] = true;
+            atlantic[m - 1][i] = true;
+        }
+        bfs(matrix, pacific, q1);
+        bfs(matrix, atlantic, q2);
+        for (int i = 0; i < m; ++i) {
+            for (int j = 0; j < n; ++j) {
+                if (pacific[i][j] && atlantic[i][j]) {
+                    res.push_back({i, j});
+                }
+            }
+        }
+    }
+    void bfs(vector<vector<int>>& matrix, vector<vector<bool>>& visited, queue<pair<int, int>>& q) {
+        int m = matrix.size(), n = matrix[0].size();
+        vector<vector<int>> dirs{{0,-1},{-1,0},{0,1},{1,0}};
+        while (!q.empty()) {
+            auto t = q.front(); q.pop();
+            for (auto dir : dirs) {
+                int x = t[0] + dir[0], y = t[1] + dir[1];
+                if (x < 0 || x >= m || y < 0 || y >= n || visited[x][y] || matrix[x][y] < matrix[t[0]][t[1]]) continue;
+                visited[x][y] = true;
+                q.push({x, y});
+            }
+        }
+    }
+};
+
+class SolutionT329 {
+public:
+    int longestIncreasingPath(vector<vector<int>>& matrix) {
+        int m = matrix.size(), n = matrix[0].size(), res = INT_MIN;
+        vector<vector<int>> visited(m, vector<int> (n, 1));
+        //visited[i][j]以i，j为终点的最长长度
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j ++) {
+                //if (visited[i][j] > 1) continue;
+                dfs(matrix, i, j, visited, res);
+            }
+        }
+        return res;
+    }
+
+    void dfs(vector<vector<int>>& matrix, int i, int j, vector<vector<int>>& visited, int& res) {
+        int m = matrix.size(), n = matrix[0].size(), curLen = visited[i][j];
+        vector<vector<int>> dirs{{0,-1},{-1,0},{0,1},{1,0}};
+        for (auto dir:dirs){
+            int x = i + dir[0], y = j + dir[1];
+            if (x < 0 || x >= m || y < 0 || y >= n || matrix[x][y] <= matrix[i][j]) continue ;
+            visited[x][y] = max(curLen+1, visited[x][y]);
+            res = max(visited[x][y], res);
+            dfs(matrix, x, y, visited, res);
+        }
+        return ;
+    }
+    //超时dfs 没有记忆化
+
+    int longestIncreasingPath(vector<vector<int>>& matrix) {
+        int m = matrix.size(), n = matrix[0].size(), res = 1;
+        vector<vector<int>> dp(m, vector<int> (n, 0));
+        //visited[i][j]以i，j为起点的最长长度
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j ++) {
+                res = max(res, dfs(matrix, i, j, dp));
+            }
+        }
+        return res;
+    }
+
+    int dfs(vector<vector<int>>& matrix, int i, int j, vector<vector<int>>& dp) {
+        int m = matrix.size(), n = matrix[0].size(), mx = 1;
+        if (dp[i][j]) return dp[i][j];
+        vector<vector<int>> dirs{{0,-1},{-1,0},{0,1},{1,0}};
+        for (auto dir:dirs){
+            int x = i + dir[0], y = j + dir[1];
+            if (x < 0 || x >= m || y < 0 || y >= n || matrix[x][y] <= matrix[i][j]) continue ;
+            int len = 1 + dfs(matrix, x, y, dp);
+            mx = max(mx, len);
+        }
+        dp[i][j] = mx;
+        return mx;
+    }
+
+//BFS 超时
+    int longestIncreasingPath(vector<vector<int>>& matrix) {
+        if (matrix.empty() || matrix[0].empty()) return 0;
+        int m = matrix.size(), n = matrix[0].size(), res = 1;
+        vector<vector<int>> dirs{{0,-1},{-1,0},{0,1},{1,0}};
+        vector<vector<int>> dp(m, vector<int>(n, 0));
+        for (int i = 0; i < m; ++i) {
+            for (int j = 0; j < n; ++j ) {
+                if (dp[i][j] > 0) continue;
+                int cnt = 1;
+                queue<pair<int, int>> q({i, j});
+                while(!q.empty()) {
+                    //每一层遍历
+                    cnt++; //到下一层的长度
+                    int len = q.size();
+                    for (int i = 0; i < len; i++) {
+                        auto t = q.front(); q.pop();
+                        //该层到下一层的遍历
+                        for (auto dir : dirs) {
+                            int x = t.first + dir[0], y = t.second + dir[1];
+                            if (x < 0 || x >= m || y < 0 || y >= n || matrix[x][y] <= matrix[t.first][t.second] || cnt <= dp[x][y]) continue;
+                            dp[x][y] = max(dp[x][y], cnt);
+                            res = max(res, cnt);
+                            q.push({x, y});
+                        }
+                    }
+
+                }
+            }
+        }
+    }
+};
+
+class SolutionT491 {
+public:
+    vector<vector<int>> findSubsequences(vector<int>& nums) {
+        set<vector<int>> res;
+        vector<int> temp;
+        helper(nums, 0, temp, res);
+        return vector<vector<int>> (res.begin(), res.end());
+    }
+
+    void helper(vector<int>& nums, int start, vector<int>& out, set<vector<int>>& res) {
+        if (out.size() >= 2) res.insert(out);
+        for (int i = start; i < nums.size(); i++) {
+            if (!out.empty() && nums[i] < out.back()) continue;
+            out.push_back(nums[i]);
+            helper(nums, i+1, out, res);
+            out.pop_back();
+        }
+    }
+};
+
+class SolutionT1752 {
+public:
+    bool check(vector<int>& nums) {
+        int minIndex = 0, minVal = nums[0];
+        for (int i = 0; i < nums.size(); i++) {
+            if (nums[i] > minVal) {
+                minIndex = i;
+                minVal = nums[i];
+                //point to the first index if duplicates
+            }
+        }
+        for (int i = minIndex + 1; i < nums.size(); i++) {
+            if (nums[i] < nums[i-1]) return false;
+        }
+        for (int i = 0; i < minIdex; i++) {
+            if (i > 0) {
+                if (nums[i] < nums[i-1]) return false;
+            }
+        }
+        if (nums[0] < nums.back()) return false;
+        return true;
+    }
+
+    bool check(vector<int>& nums) {
+        vector<int> temp = nums;
+        sort(temp.begin(), temp.end());
+        int minIndex = 0, minVal = nums[0];
+        for (int i = 0; i < nums.size(); i++) {
+            if (nums[i] < minVal) {
+                minIndex = i;
+                minVal = nums[i];
+                //point to the first index if duplicates
+            }
+        }
+        for (int i = 0; i < nums.size(); i++) {
+            if (nums[i] == minVal) {
+                if (checkArr(temp, nums, i)) return true;
+            }
+        }
+        return false;
+    }
+
+    bool checkArr(vector<int> temp, vector<int> nums, int i) {
+        int step = 0;
+        while(i + step < nums.size()) {
+            if (temp[step] != nums[i + step]) return false;
+            step++;
+        }
+        int start = 0;
+        while(step < nums.size() && start < i) {
+            if (temp[step] != nums[start]) return false;
+            step++; start++;
+        }
+        return true;
+    }
+};
+
+class SolutionT1753 {
+public:
+    int maximumScore(int a, int b, int c) {
+        vector<int> nums({a, b, c});
+        sort(nums.begin(), nums.end());
+        a = nums[0], b = nums[1], c = nums[2];
+        if (a + b <= c) return a + b;
+        else return a + b + C;
+    }
+};
+
+class SolutionT1754
+{
+public:
+    string largestMerge(string word1, string word2) 
+    {
+        string res;
+        int i=0,    j = 0;
+        while (i<word1.size() && j<word2.size())
+        {   
+            if (word1.substr(i) > word2.substr(j))  //c++自带的字符串比较功能
+                res += word1[i++];
+            else
+                res += word2[j++];
+        }
+        if (i < word1.size())
+            res += word1.substr(i);
+        if (j < word2.size())
+            res += word2.substr(j);
+        return res;
+    }
+};
+
+class SolutionT1755 {
+public:
+    vector<int> make(vector<int> nums) {
+        vector<int> ans(1 << nums.size());
+        for (int i = 0; i < nums.size(); i++) {
+            for (int j = 0; j < (1 << i); j++) {
+                ans[j + (1 << i)] = ans[j] + nums[i];
+            }
+        }
+        return ans;
+    }
+
+    int minAbsDifference(vector<int>& nums, int goal) {
+        int n = nums.size();
+        vector<int> left = make({nums.begin(), nums.begin() +n/2});
+        vector<int> right = make({nums.begin()+n/2, nums.end()});
+        sort(left.begin(), left.end());
+        sort(right.rbegin(), right.rend());
+        int ans = INT_MAX, i = 0, j = 0;
+        while(i < left.size() && j < right.size()) {
+            int temp = left[i] + right[j];
+            ans = min(ans, abs(goal - temp));
+            if (t > goal) j++;
+            else if(t < goal) i++;
+            else return 0;
+        }
+        return ans;
+    }
+};
+
+class SolutionT22 {
+public:
+    vector<string> generateParenthesis(int n) {
+        vector<string> res;
+        string temp = "";
+        dfs(n , n, res, temp);
+        return res;
+    }
+
+    void dfs(int left, int right, vector<string>& res, string& temp) {
+        if (left > right || left < 0 || right < 0) return;
+        if (left == 0 && right == 0) {
+            res.push_back(temp);
+        }
+        dfs(left-1, right, res, temp+"(");
+        dfs(left, right-1, res, temp+")");
+        return ;
+    }
+};
+
+
+class SolutionT1748 {
+public:
+    int sumOfUnique(vector<int>& nums) {
+        int cnt[101] = {}, res = 0;
+        for (auto n : nums)
+            res += ++cnt[n] == 1 ? n : cnt[n] == 2 ? - n : 0;
+        return res;
+    }
+};
+
+class SolutionT1749 {
+public:
+    int maxAbsoluteSum(vector<int>& nums) {
+        int res = INT_MIN, tempSum = 0;
+        int sumFlag = 1;
+        for (int i = 0; i < nums.size(); i++) {
+            tempSum = 0;
+            int sumFlag = 1;
+            for (int j = i; j < nums.size(); j++) {
+                if (tempSum == 0) {
+                    tempSum = tempSum + nums[j];
+                    sumFlag = tempSum > 0 ? 1 : -1;
+                    res = max(res, abs(tempSum));
+                    continue;
+                }
+                int temp = tempSum + nums[j];
+                if (sumFlag > 0 && temp <= 0) break;
+                if (sumFlag < 0 && temp >= 0) break;
+                tempSum = temp;
+                res = max(res, abs(tempSum));
+            }
+        }
+        return res;
+    }
+};
+
+class SolutionT767 {
+public:
+    string reorganizeString(string S) {
+        string res = "";
+        unordered_map<char, int> m;
+        priority_queue<pair<int, char>> q;
+        for (char c : S) ++m[c];
+        for (auto a : m) {
+            if (a.second > (S.size() + 1) / 2) return "";
+            //只要满足了这个条件，就一定可以成功
+            q.push({a.second, a.first});
+        }
+        while (q.size() >= 2) {
+            auto t1 = q.top(); q.pop();
+            auto t2 = q.top(); q.pop();
+            res.push_back(t1.second);
+            res.push_back(t2.second);
+            if (--t1.first > 0) q.push(t1);
+            if (--t2.first > 0) q.push(t2);
+            //因为堆重新排列的结构，即使个数相同，后来的元素也在后面，排除了你那种，如果-1后和之后的字母个数相同，
+            //要不要判断会不会和之前的那个字母重复
+        }
+        if (q.size() > 0) res.push_back(q.top().second);
+        return res;
+    }
+};
+
+class SolutionT368 {
+public:
+    vector<int> largestDivisibleSubset(vector<int>& nums) {
+        sort(nums.begin(), nums.end());
+        vector<int> dp(nums.size(), 0), parent(nums.size(), 0), res;
+        int mx = 0, mx_idx = 0;
+        for (int i = nums.size() - 1; i >= 0; --i) {
+            for (int j = i; j < nums.size(); ++j) {
+                if (nums[j] % nums[i] == 0 && dp[i] < dp[j] + 1) {
+                    dp[i] = dp[j] + 1;
+                    parent[i] = j;
+                    if (mx < dp[i]) {
+                        mx = dp[i];
+                        mx_idx = i;
+                    }
+                }
+            }
+        }
+        for (int i = 0; i < mx; ++i) {
+            res.push_back(nums[mx_idx]);
+            mx_idx = parent[mx_idx];
+        }
+    }
+     
+
+    vector<int> largestDivisibleSubset(vector<int>& nums) {
+        sort(nums.begin(), nums.end());
+        vector<int> dp(nums.size(), 0), parent(nums.size(), 0);
+        int mx = 0, mxIdx = 0;
+        for (int i = 0 i < nums.size; i++) {
+            for (int j = i; j < nums.size(); j++) {
+                if (nums[j] % nums[i] == 0 && dp[j] < dp[i] + 1) {
+                    dp[j] = dp[i] + 1;
+                    parent[j] = i;
+                    if (dp[j] > mx) {
+                        mx = dp[i];
+                        mxIdx = j;
+                    }
+                }
+            }
+        }
+        vector<int> res;
+        for (int i = 0; i < mx; i++) {
+            res.push_back(nums[mxIdx]);
+            mxIdx = parent[mxIdx];
+        }
+        return res;
+    }
+};
+
+class SolutionT516 {
+public:
+    int longestPalindromeSubseq(string s) {
+        int n = s.size();
+        vector<vector<int>> dp(n, vector<int>(n));
+        for (int i = n - 1; i >= 0; i--) {
+            for (int j = i + 1; j < n; j++) {
+
+            }
+        }
+    }
+};
+
+class SolutionT995 {
+public:
+    int minKBitFlips(vector<int>& A, int K) {
+
+    }
+};
+
+class SolutionT1534 {
+public:
+    int countGoodTriplets(vector<int>& arr, int a, int b, int c) {
+
+    }
+};
+
+class SolutionT1751 {
+public:
+    vector<vector<int>> dp;
+
+    int dfs(vector<vector<int>>& events, int pos, int k) {
+        if (pos >= events.size() || k == 0) return 0;
+        if (dp[pos][k] != -1) return dp[pos][k];
+        auto j = upper_bound(events.begin() + pos, events.end(), events[pos][1], [](int t, const vector<int>
+        &v){v[0] > t;} - events.begin()) //因为找的是绝对位置，也就是相对于第一个位置的偏移量
+        //要这个 不要这个 比大小
+        return dp[i][k] = max(e[i][2] + dfs(e, j, k - 1), dfs(e, i + 1, k));
+        //e[i][2]是当前值
+    }
+
+    int maxValue(vector<vector<int>>& events, int k) {
+        sort(events.begin(), events.end());
+        dp = vector<vector<int>>(events.size(), vector<int>(k + 1, -1));
+        return dfs(events, 0, k);
+    }
+};
+
+class SolutionT1756 {
+public:
+    string modifyString(string s) {
+        for (int i = 0; i < s.size(); i++);
+    }
+};

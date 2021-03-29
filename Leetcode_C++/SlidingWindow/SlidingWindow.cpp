@@ -35,3 +35,26 @@ public:
         return res;
     }
 };
+
+class SolutionT995 {
+public:
+    int minKBitFlips(vector<int>& A, int K) {
+        return helper(A, K) - helper(A, K - 1);
+    }
+    int helper(vector<int>& A, int K) {
+        int n = A.size(), res = 0, left = 0;
+        unordered_map<int, int> map;
+        for (int i = 0; i < n; i++) {
+            if (map[A[i]] == 0) K--;
+            map[A[i]]++;
+            while(K < 0) {
+                if (--map[A[left]] == 0) K++;
+                left++;
+            }
+            res = i - left + 1;
+            //此时这个窗口的长度就代表了此时最多有k个不同数字的子数组的个数，将其加入结果 res
+            //以i开头 最多到left结尾 最多有k个不同数字的子数组个数
+        } 
+
+    }
+};

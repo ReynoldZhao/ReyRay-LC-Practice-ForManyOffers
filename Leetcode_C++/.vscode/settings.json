@@ -8,6 +8,14 @@
         "type_traits": "cpp",
         "string": "cpp",
         "thread": "cpp",
-        "iostream": "cpp"
+        "iostream": "cpp",
+        "array": "cpp",
+        "hash_map": "cpp",
+        "bitset": "cpp",
+        "string_view": "cpp",
+        "initializer_list": "cpp",
+        "utility": "cpp",
+        "deque": "cpp",
+        "set": "cpp"
     }
 }

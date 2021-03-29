@@ -166,3 +166,56 @@ public:
         return dp[0][K - 1];
     }
 };
+
+class SolutionT727 {
+public:
+    string minWindow(string S, string T) {
+        int m = S.size(), n = T.size(), start = -1, minLen = INT_MAX;
+        vector<vector<int>> dp(m + 1, vector<int>(n + 1, -1));
+        for (int i = 0; i <= m; i++) {
+            dp[i][0] = i;
+        }
+        for (int i = 1; i <= m; i++) {
+            for (int j = 1; j <= min(i, n); j++) {
+                dp[i][j] = (S[i-1] == T[j-1]) ? dp[i-1][j-1]:dp[i-1][j];
+            }
+        }
+
+    }
+};
+
+class SolutionT978 {
+public:
+    int maxTurbulenceSize(vector<int>& arr) {
+        int res = 1;
+        vector<int> dec(arr.size(), 1), inc(arr.size(), 1);
+        for (int i = 1; i < arr.size(); i++) {
+            if (arr[i-1] > arr[i]) {
+                dec[i] = inc[i-1] + 1;
+            } else if (arr[i-1] < arr[i]) {
+                inc[i] = dec[i-1] + 1;
+            }
+            res = max(res, max(dec[i], inc[i]));
+        }
+        return res;
+    }
+
+//众所周知一维数组可以压缩空间
+    int maxTurbulenceSize(vector<int>& arr) {
+        int res = 1, n = arr.size(), inc = 1, dec = 1;
+        for (int i = 1; i < n; ++i) {
+            if (arr[i] < arr[i - 1]) {
+                dec = inc + 1;
+                inc = 1;
+            } else if (arr[i] > arr[i - 1]) {
+                inc = dec + 1;
+                dec = 1;
+            } else {
+                inc = 1;
+                dec = 1;
+            }
+            res = max(res, max(inc, dec));
+        }
+        return res;
+    }
+};
