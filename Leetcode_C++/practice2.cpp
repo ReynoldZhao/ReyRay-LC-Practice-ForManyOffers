@@ -164,3 +164,108 @@ public:
         return cur;
     }
 };
+
+class Solution {
+public:
+    vector<int> topKFrequent(vector<int>& nums, int k) {
+        unordered_map<int, int> map;
+        for (const auto &num:nums) map[num]++;
+        auto cmp = [](const pair<int, int> &a, const pair<int, int> &b){
+            return a.first < b.first;
+        }; //less maxheap
+        priority_queue<pair<int, int>, vector<pair<int,int> >, decltype(cmp)> pq(cmp);
+        for (auto it:map) {
+            pq.push(make_pair(it.second, it.first));
+        }
+        vector<int> res;
+        for (int i = 0; i < k; i++) {
+            auto temp = pq.top(); pq.pop();
+            res.push_back(temp.second);
+        }
+        return res;
+    }
+
+    vector<int> topKFrequent(vector<int>& nums, int k) {
+        unordered_map<int, int> map;
+        for (const auto &num:nums) map[num]++;
+        auto cmp = [](const pair<int, int> &a, const pair<int, int> &b) {
+            return a.first < b.first;
+        };
+        priority_queue<pair<int, int>, vector<pair<int, int> >, decltype(cmp)> pq(cmp);
+        for (auto it : map) {
+            pq.push(make_pair(it.second, it.first));
+        }
+        vector<int> res;
+    }
+};
+
+class SolutionT845 {
+public:
+    int longestMountain(vector<int>& arr) {
+        int n = arr.size() - 1, left = 0, right = 0, length = 1;
+        int pos = 0, prepos = n;
+        while(prepos == pos) {
+            prepos = pos;
+            pos = peakIndexInMountainArray(arr, left, right);
+            if (pos != n || (pos == n && arr[pos] < arr[pos - 1])) {
+                int tempLength = findMaxLength(arr, pos);
+                length = max(length, tempLength);
+            }
+        }
+        return length;
+    }
+
+    int findMaxLength(vector<int>& arr, int pos) {
+        int leftEnd = pos, rightEnd = pos, n = arr.size() - 1;
+        while(leftEnd - 1 >= 0 && arr[leftEnd - 1] < arr[leftEnd]) leftEnd--;
+        while(rightEnd + 1 <= n && arr[rightEnd + 1] < arr[rightEnd]) rightEnd++；
+        return rightEnd - leftEnd + 1;
+    }
+
+    int peakIndexInMountainArray(vector<int>& A, int left, int right) {
+		while (left < right) {
+			int mid = left + (right - left) / 2;
+			if (A[mid] < A[mid + 1]) left = mid + 1;
+			else right = mid;
+		}
+        return right;
+    }
+
+
+    //双数组up down，记录以该点为终点的最长递增、递减的长度；
+    int longestMountain(vector<int>& arr) {
+        int res = 0, n = arr.size();
+        vector<int> up(n), down(n);
+        for (int i = n - 2; i >= 0; --i) {
+            if (arr[i] > arr[i + 1]) {
+                down[i] = down[i] + 1;
+            }
+        }
+        for (int i = 1; i < n; ++i) {
+            if (A[i] > A[i - 1]) up[i] = up[i - 1] + 1;
+            if (up[i] > 0 && down[i] > 0) res = max(res, up[i] + down[i] + 1);
+        }
+        return res;
+    }
+};
+
+class Solution {
+public:
+    int trap(vector<int>& height) {
+        int l = 0, r = height.size() - 1, res = 0;
+        while ( l < r) {
+            int mn = min(height[l], height[r]);
+            if (mn == height[l]) {
+                ++l;
+                while ( l < r && height[l] < mn) {
+                    res += mn - height[l++];
+                }
+            } else {
+                --r;
+                while (l < r && height[r] < mn) {
+                    res += mn - height[r--];
+                }
+            }
+        }
+    }
+};

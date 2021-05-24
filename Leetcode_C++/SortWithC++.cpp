@@ -14,11 +14,39 @@
 #include<deque>
 using namespace std;
 
+// QuickSort
+int partition(vector<int> &arr, int l, int r) {
+    int pivot = arr[r];
+    //以l-1作为指针的起始点，以后每次遍历，都只用swap(arr[++i],arr[j])
+    //非常直观
+    int i = l - 1;
+    for (int j = l; j < r; j++) {
+        if (arr[j] <= pivot) {
+            i++;
+            swap(arr[i], arr[j]);
+        }
+    }
+    swap(arr[i+1], arr[r]);
+    return i+1;
+}
+void quickSort(vector<int> &arr, int l, int r) {
+    if (l >= r) return;
+    int mid = partition(arr, l, r);
+    quickSort(arr, l, mid - 1);
+    quickSort(arr, mid + 1, r);
+}
+void qSort(vector<int> &arr) {
+    return quickSort(arr, 0, arr.size()-1);
+}
+
 //基于随机的快排
-class Solution {
+//这里其实是找到kth最大
+class SolutionT215 {
     int partition(vector<int>& nums, int l, int r) {
         int pivot = nums[r];
         int i = l - 1;
+        //起始点是 l - 1
+        //方便后面遍历，与swap交换，最稳妥的快排
         for (int j = l; j <= r - 1; ++j) {
             if (nums[j] <= pivot) {
                 i = i + 1;
@@ -34,12 +62,15 @@ class Solution {
         swap(nums[r], nums[i]);
         return partition(nums, l, r);
     }
+    //注意 k一直指的是第k个
     void randomized_selected(vector<int>& arr, int l, int r, int k) {
         if (l >= r) {
             return;
         }
         int pos = randomized_partition(arr, l, r);
+        //指的是当前这个数，是在l，r范围内的第几个
         int num = pos - l + 1;
+        //这里是一个对k的判断，决定接下来的排序方向，因为不用全部都排
         if (k == num) {
             return;
         } else if (k < num) {
@@ -59,6 +90,103 @@ public:
         return vec;
     }
 };
+
+//三路快排
+public void partition2(int[] nums, int low, int high) {
+        // write your code here
+        if (nums == null ||  nums.length == 0) {
+            return;
+        }
+        
+        int l = -1, i = 0, r = nums.length;
+        while (i < r) {
+        	// 如果当前数字小于low，那么就将其换到左边；
+        	// 由于我们已经保证了A(l, i]在low与high之间，所以交换完毕后，A[i]已经在low与high之间了，所以将i也右移
+        	// 如果当前数字大于high，则将其换到右边；如果当前数字在low与high直接，就直接右移i
+            if (nums[i] < low) {
+                swap(nums, i++, ++l);
+            } else if (nums[i] > high) {
+                swap(nums, i, --r);
+            } else {
+                i++;
+            }
+        }
+    }
+    
+    private void swap(int[] nums, int i, int j) {
+        int tmp = nums[i];
+        nums[i] = nums[j];
+        nums[j] = tmp;
+    }
+
+
+class SolutionT215KthLargest {
+public:
+    int findKthLargest(vector<int>& nums, int k) {
+        int n = nums.size(), target = n - k;
+        return quickSelect(nums, 0, n-1, target);
+    }
+
+    int quickSelect(vector<int>& nums, int l, int r, int target) {
+        int pos = partition(nums, l, r);
+        if (pos == target) return nums[pos];
+        else {
+            return pos < target ? quickSelect(nums, pos + 1, r, target) : quickSelect(nums, l, pos - 1, target);
+        }
+    }
+
+    //这个partition其实很绕了
+    int partition(vector<int>& nums,int left, int right){
+        int pivot = nums[right];
+        int l = left, r = right-1;
+        while (l <= r) {
+            if (nums[l] > pivot && nums[r] < pivot) {
+                swap(nums[l++], nums[r--]);
+            }
+            //这个真的不好理解
+            if (nums[l] <= pivot) l++;
+            if (nums[r] >= pivot) r--;
+        }
+        swap(nums[l], nums[right]);
+        return l;
+    }
+};
+
+//Three way QuickSort
+
+void quickSort3Way(vector<int> arr, int l, int r) {
+ 
+	if (l >= r)
+		return;
+ //随机选择要做比较的值
+	swap(arr[l], arr[rand() % (r - l + 1) + l]);
+	int v = arr[l];
+	int lt = l;     // arr[l+1...lt] < v
+    int rt = r + 1; // arr[rt...r] > v
+    int i = l+1;    // arr[lt+1...i) == v
+    //已有序游标为lt，如果pivot是最右值，游标初始值为l - 1;
+    // --- lt(最后一个小于) ---- rt（第一个大于） ----
+	while (i<rt) {
+		if (arr[i] < v) {
+			swap(arr[i], arr[lt+1]);
+			lt++;
+			i++;
+		}
+		if (arr[i] == v) {
+			i++;
+		}
+		if (arr[i] > v) {
+			swap(arr[i], arr[rt-1]);
+			rt--;
+            //注意这里i不变化
+		}
+ 
+	}
+	swap(arr[l], arr[lt]);
+	quickSort3Way(arr, l, lt-1 );
+	quickSort3Way(arr, rt, r);
+ 
+}
 
 
 
@@ -106,64 +234,7 @@ void insertSort(vector<int> &arr) {
     }
 }
 
-// QuickSort
-int partition(vector<int> &arr, int l, int r) {
-    int pivot = arr[r];
-    int i = l - 1;
-    for (int j = l; j < r; j++) {
-        if (arr[j] <= pivot) {
-            i++;
-            swap(arr[i], arr[j]);
-        }
-    }
-    swap(arr[i+1], arr[r]);
-    return i+1;
-}
-void quickSort(vector<int> &arr, int l, int r) {
-    if (l >= r) return;
-    int mid = partition(arr, l, r);
-    quickSort(arr, l, mid - 1);
-    quickSort(arr, mid + 1, r);
-}
-void qSort(vector<int> &arr) {
-    return quickSort(arr, 0, arr.size()-1);
-}
 
-//Three way QuickSort
-
-void quickSort3Way(vector<int> arr, int l, int r) {
- 
-	if (l >= r)
-		return;
- //随机选择要做比较的值
-	swap(arr[l], arr[rand() % (r - l + 1) + l]);
-	int v = arr[l];
-	int lt = l;     // arr[l+1...lt] < v
-    int rt = r + 1; // arr[rt...r] > v
-    int i = l+1;    // arr[lt+1...i) == v
-    //已有序游标为lt，如果pivot是最右值，游标初始值为l - 1;
-    // --- lt(最后一个小于) ---- rt（第一个大于） ----
-	while (i<rt) {
-		if (arr[i] < v) {
-			swap(arr[i], arr[lt+1]);
-			lt++;
-			i++;
-		}
-		if (arr[i] == v) {
-			i++;
-		}
-		if (arr[i] > v) {
-			swap(arr[i], arr[rt-1]);
-			rt--;
-            //注意这里i不变化
-		}
- 
-	}
-	swap(arr[l], arr[lt]);
-	quickSort3Way(arr, l, lt-1 );
-	quickSort3Way(arr, rt, r);
- 
-}
 
 
 // MergeSort 

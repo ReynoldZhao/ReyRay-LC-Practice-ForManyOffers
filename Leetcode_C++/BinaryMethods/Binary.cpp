@@ -469,10 +469,11 @@ public:
         int right = binary_search(image, false, y + 1, n, up, down, false);
         return (right - left) * (down - up);
     }
+    //h 行还是列, i, j 二分的主范围，中心点距离各个边界的距离，上下左右，low，high是遍历距离，opt表明是否越界
     int binary_search(vector<vector<char>> &image, bool h, int i, int j, int low, int high, bool opt) {
         while (i < j) {
-            int k = low, mid = (i + j) / 2;
-            while (k < high && (h ? image[mid][k] : image[k][mid]) == '0') ++k;
+            int mid = i + (j - i)/2, k = low;
+            while(k < high && (h ? image[mid][k]:image[k][mid]) == '0') k++;
             if (k < high == opt) j = mid;
             else i = mid + 1;
         }

@@ -81,3 +81,89 @@ public:
         return true;
     }
 };
+
+class SolutionT323 {
+public:
+    int countComponents(int n, vector<pair<int, int> >& edges) {
+        int res = 0;
+        vector<vector<int> > g(n);
+        vector<bool> v(n, false);
+        for (auto a : edges) {
+            g[a.first].push_back(a.second);
+            g[a.second].push_back(a.first);
+        }
+        for (int i = 0; i < n; ++i) {
+            if (!v[i]) {
+                ++res;
+                dfs(g, v, i);
+            }
+        }
+        return res;
+    }
+
+    void dfs(vector<vector<int> > &g, vector<bool> &v, int i) {
+        if (v[i]) return ;
+        v[i] = true;
+        for (int j = 0; j < g[i].size(); j++) {
+            dfs(g, v, g[i][j]);
+        }
+    }
+};
+
+//DFS
+class SolutionT547 {
+public:
+    int findCircleNum(vector<vector<int>>& M) {
+        int n = M.size(), res = 0;
+        vector<bool> visited(n, false);
+        for (int i = 0; i < n; ++i) {
+            if (visited[i]) continue;
+            helper(M, i, visited);
+            ++res;
+        }
+        return res;
+    }
+    void helper(vector<vector<int>>& M, int k, vector<bool>& visited) {
+        visited[k] = true;
+        for (int i = 0; i < M.size(); ++i) {
+            if (!M[k][i] || visited[i]) continue;
+            helper(M, i, visited);
+        }
+    }
+};
+
+// DFS
+class SolutionT261 {
+public:
+    bool validTree(int n, vector<pair<int, int>>& edges) {
+        vector<vector<int>> g(n, vector<int>());
+        vector<bool> v(n, false);
+        for (auto a : edges) {
+            g[a.first].push_back(a.second);
+            g[a.second].push_back(a.first);
+        }
+        if (!dfs(g, v, 0, -1)) return false;
+        for (auto a : v) {
+            if (!a) return false;
+        }
+        return true;
+    }
+
+    bool dfs(vector<vector<int>> &g, vector<bool> &v, int cur, int pre) {
+      if (v[cur]) return false;
+      v[cur] = true;
+      for (auto a : g[cur]) {
+          if (a != pre) {
+              //pre 是为了防止 a->b 遍历b的邻接数组的时候肯定有a，防止回流
+              if(!dfs(g, v, a, cur)) return false;
+          }
+      }
+      return false;
+    }
+};
+
+class Solution {
+public:
+    vector<int> findRedundantConnection(vector<vector<int>>& edges) {
+    }
+}

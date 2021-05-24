@@ -121,3 +121,20 @@ public:
         return res;
     }
 };
+
+class SolutionT253 {
+public:
+    int minMeetingRooms(vector<vector<int>>& intervals) {
+        map<int, int> m;
+        for (auto interval : intervals) {
+            m[interval[0]]++;
+            m[interval[1]]--;
+        }
+        int res = 0, room = 0;
+        for (auto a : m) {
+            room = room + a.second;
+            res = max(res, room);
+        }
+        return res;
+    }
+};
