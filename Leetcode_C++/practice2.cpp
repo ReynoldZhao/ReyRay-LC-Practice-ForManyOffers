@@ -249,23 +249,58 @@ public:
     }
 };
 
-class Solution {
+class SolutionT986 {
 public:
-    int trap(vector<int>& height) {
-        int l = 0, r = height.size() - 1, res = 0;
-        while ( l < r) {
-            int mn = min(height[l], height[r]);
-            if (mn == height[l]) {
-                ++l;
-                while ( l < r && height[l] < mn) {
-                    res += mn - height[l++];
-                }
+    vector<vector<int>> intervalIntersection(vector<vector<int>>& firstList, vector<vector<int>>& secondList) {
+        int m = firstList.size(), n = secondList.size(), i = 0, j = 0;
+        vector<vector<int>> res;
+        while ( i < m && j < n) {
+            if (firstList[i][1] < secondList[j][0]) {
+                i++;
+            } else if (secondList[j][1] < firstList[i][0]) {
+                j++;
             } else {
-                --r;
-                while (l < r && height[r] < mn) {
-                    res += mn - height[r--];
+                if (secondList[j][0] <= firstList[i][1] && secondList[j][1] >=firstList[i][1]) {
+                    res.push_back({max(secondList[j][0], firstList[i][0]), min(firstList[i][1], secondList[j][1])});
+                    i++;
+                } else if (firstList[i][0] <= secondList[j][1] && firstList[i][1] >= secondList[j][1]) {
+                    res.push_back({max(secondList[j][0], firstList[i][0]), min(firstList[i][1], secondList[j][1])});
+                    j++;
                 }
             }
+        }
+        return res;
+    }
+};
+
+class SolutionT3{
+public:
+    int lengthOfLongestSubstring(string s) {
+        unordered_map<int, int> map;
+        int left = 0, res = 0;
+        for (int i = 0; i < s.size(); i++) {
+            if (map.count(s[i]) && map[s[i]] > left) {
+                left = map[s[i]];
+            }
+            map[s[i]] = i;
+            res = max(res, i - left);
+        }
+        return res;
+    }
+};
+
+class SolutionT159 {
+public:
+    int lengthOfLongestSubstringTwoDistinct(string s) {
+        unordered_map<int, int> map;
+        int left = 0, res = 0;
+        for (int i = 0; i < s.size(); i++) {
+            map[s[i]]++;
+            while(map.size() > 2) {
+                if (--map[s[left]] == 0) map.erase(s[left]);
+                left++;
+            }
+            res = max(res, i - left + 1);
         }
     }
 };

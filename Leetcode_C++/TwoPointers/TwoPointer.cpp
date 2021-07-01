@@ -137,4 +137,38 @@ public:
         }
         return res;
     }
+
+    int minMeetingRooms(vector<vector<int>>& intervals) {
+        vector<int> starts, ends;
+        int res = 0, endpos = 0;
+        for (auto a : intervals) {
+            starts.push_back(a[0]);
+            ends.push_back(a[1]);
+        }
+        sort(starts.begin(), starts.end());
+        sort(ends.begin(), ends.end());
+        for (int i = 0; i < intervals.size(); i++) {
+            if (starts[i] < ends[endpos]) res++;
+            else endpos++;
+        }
+    }
+};
+
+class Solution {
+public:
+    vector<vector<int>> intervalIntersection(vector<vector<int>>& firstList, vector<vector<int>>& secondList) {
+        int n = firstList.size();
+        vector<int> start, end; 
+        vector<vector<int>> res;
+        for (int i = 0; i < n; i++) {
+            start.push_back(firstList[i][0]); 
+            end.push_back(firstList[i][1]); 
+        }
+        int cur_end = 0;
+        for (int i = 0; i < n; i++) {
+            if (secondList[i][0] < firstList[cur_end][0]) {
+                res.push_back(firstList[cur_end]);
+            }
+        }
+    }
 };
