@@ -26,6 +26,22 @@ struct TreeNode {
 // T94 Binary Tree Inorder Traversal 
 class SolutionT94 {
 public:
+    vector<int> inorderTraversal(TreeNode* root) { 
+        vector<int> res; 
+        stack<TreeNode*> s; 
+        TreeNode *p = root; 
+        while (!s.empty() || p) { 
+            if (p) { 
+                s.push(p); 
+                p = p->left; 
+            } else { 
+                p = s.top(); s.pop(); 
+                res.push_back(p->val); 
+                p = p->right; 
+            } 
+        } 
+        return res; 
+    } 
     vector<int> inorderTraversal(TreeNode* root) {
         vector<int> res;
         stack<TreeNode*> s;

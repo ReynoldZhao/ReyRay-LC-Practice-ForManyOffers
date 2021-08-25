@@ -138,3 +138,27 @@ public:
         return res;
     }
 };
+
+class SolutionT300 {
+public:
+    int lengthOfLIS(vector<int>& nums) {
+        vector<int> st;
+        for (int i = 0; i < nums.size(); i++) {
+            if (st.empty() || nums[i] > st.back()) {
+                st.push_back(nums[i]);
+                continue;
+            }
+            else {
+                int left = 0, right = st.size();
+                while (left < right) {
+                    int mid = (right - left) / 2 + left;
+                    if (st[mid] < nums[i]) left = mid + 1;
+                    else right = mid;
+                }
+                if (right >= st.size()) st.push_back(nums[i]);
+                else st[right] = nums[i];
+            }
+        }
+        return st.size();
+    }
+};

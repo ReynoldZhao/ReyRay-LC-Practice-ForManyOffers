@@ -219,3 +219,69 @@ public:
         return res;
     }
 };
+
+//backpack 1
+class Solution {
+public:
+    /**
+     * @param m: An integer m denotes the size of a backpack
+     * @param A: Given n items with size A[i]
+     * @return: The maximum size
+     */
+    int backPack(int m, vector<int> &A) {
+        // write your code here
+        sort(A.begin(), A.end());
+        int left = 0, sum = 0, i = 0, res = 0;
+        while (i < A.size()) {
+            sum += A[i];
+            i++;
+            while (sum > m && left <= i) {
+                sum -= A[left];
+                left++;
+            }
+            res = max(res, sum);
+        }
+        return res;
+    }
+
+    int backPack(int m, vector<int> &A) {
+        vector<int> dp(m+1, 0);
+        int n = A.size();
+        if (A.size() == 0 || m == 0) {
+            return 0;
+        }
+        for (int i = 0; i < n; i++) {
+            for (int j = m; j >= A[i]; j--) {
+                //dp[i][j] = max(dp[i-1][j], dp[i-1][j-A[i]] + A[i]);
+                dp[j] = max(dp[j], dp[j - A[i]] + A[i]);
+            }
+        }
+        //return dp[i-1][m];
+        return dp[m];
+    }
+};
+
+//backpack 2
+class Solution {
+public:
+    /**
+     * @param m: An integer m denotes the size of a backpack
+     * @param A: Given n items with size A[i]
+     * @param V: Given n items with value V[i]
+     * @return: The maximum value
+     */
+    int backPackII(int m, vector<int> &A, vector<int> &V) {
+        // write your code here
+        vector<int> dp(m + 1, 0);
+        int n = A.size();
+        if (A.size() == 0 || m == 0) {
+            return 0;
+        }
+        for (int i = 0; i < n; i++) {
+            for (int j = m; j >= A[i]; --j) {
+                dp[j] = max(dp[j], dp[j - A[i]] + V[i]);
+            }
+        }
+        return dp[m];
+    }
+};
