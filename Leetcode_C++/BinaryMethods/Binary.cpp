@@ -14,6 +14,109 @@
 #include<deque>
 using namespace std;
 
+int find(vector<int>& nums, int target) {
+    int left = 0, right = nums.size();
+    while (left < right) {
+        int mid = (right - left) / 2 + left;
+        if (nums[mid] < target) left = mid + 1;
+        else if (nums[mid] <= target) right = mid;
+    }
+    return right;
+}
+
+class SolutionT875 {
+public:
+    int minEatingSpeed(vector<int>& piles, int h) {
+        // int minK = INT_MAX, maxK = INT_MIN, sum = 0; 
+        // for (int i = 0; i < piles.size(); i++) { 
+        //     if (piles[i] < minK) minK = piles[i]; 
+        //     if (piles[i] > maxK) maxK = piles[i]; 
+        //     sum += piles[i]; 
+        // } 
+        int left = 0, right = 1e9; 
+        while (left < right ) {
+            int mid = (right - left) / 2 + left;
+            if (mid == 0) break;
+            int k = 0;
+            for (auto pile : piles) {
+                k += (pile + mid - 1) / mid; 
+            }
+            if (k > h) left = mid + 1;
+            else right = mid;
+        }
+        return (right - left) / 2 + left == 0 ? 1:right;
+    }
+};
+
+class SolutionT33 {
+public:
+    int search(vector<int>& nums, int target) {
+        int left = 0, right = nums.size() - 1;
+        while (left < right) {
+            int mid = (right - left) / 2 + left;
+            if (target == nums[mid]) return mid;
+            if (nums[mid] > nums[right]) {
+                if (nums[left] <= target && target < nums[mid]) right = mid - 1;
+                else left = mid + 1;
+            } else {
+                if (target >= nums[mid] && target <= nums[right]) left = mid + 1;
+                else right = mid - 1;
+            }
+        }
+        return nums[left] == target ? left : -1;
+    }
+};
+
+class SolutionT302 {
+public:
+    int minArea(vector<vector<char>>& image, int x, int y) {
+        
+    }
+
+    int binarySearch(vector<vector<char>> &image, int left, int right, int range_start, int range_end, bool opt) {
+        int k = range_start;
+        while (left < right) {
+            int mid = (right - left) / 2 + left;
+            while (image[mid][k] != 1) k++;
+            if (k < range_end == opt) {
+                right = mid;
+            } else left = mid + 1;
+        }
+        return left;
+    }
+};
+
+class Solution {
+public:
+    /**
+     * @param L: Given n pieces of wood with length L[i]
+     * @param k: An integer
+     * @return: The maximum length of the small pieces
+     */
+    int woodCut(vector<int> &L, int k) {
+        // write your code here
+        if (L.size() == 0) return 0;
+        int right = INT_MIN;
+        for (auto l : L) right = max(right, l);
+        if (right < INT_MAX) right += 1;
+        int left = 1; 
+        while (left < right) {
+            int mid = (right - left) / 2 + left, sum = 0;
+            for (auto l : L) {
+                sum += l / mid;
+            }
+            if (sum >= k) {
+                left = mid + 1;
+            }
+            else right = mid;
+        }
+        left -= 1;
+        int temp_sum = 0;
+        for (auto l : L) { temp_sum += l/left;}
+        return (left > 0 && temp_sum >= k) ? left : 0;
+    }
+};
+
 class SolutionT658 {
 public:
     //反向思维，从数组中去除n-k个元素，肯定是从头尾去除

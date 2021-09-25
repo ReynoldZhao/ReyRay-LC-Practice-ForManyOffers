@@ -185,4 +185,120 @@ public:
     }
 };
 
+class SolutionT472 {
+public:
+    //每次都遍历会超时的
+    vector<string> findAllConcatenatedWordsInADict(vector<string>& words) {
+        vector<string> res;
+        unordered_set<string> set(words.begin(), words.end());
+        for (auto word : words) {
+            if (helper(word, words, set, 0, 0)) res.push_back(word);
+        }
+        return res;
+    }
+
+    bool helper(string word, vector<string>& words, unordered_set<string> set, int pos, int count) {
+        if (pos >= word.size() && count >= 2) return true;
+        // for (auto word : words) {
+        //     int len = word.size();
+        //     if (len <= cur_word.size() && cur_word.substr(0, len) == word && helper(cur_word.substr(len), words, count+1)) {
+        //         return true;
+        //     }
+        // }
+        for (int i = pos; i < word.size(); i++) {
+            string t = word.substr(pos, i - pos + 1);
+            if (set.count(t) && helper(word, words, set, i + 1, count+1))
+                return true;
+        }
+        return false;
+    }
+};
+
+//WordBreak
+class SolutionT139 {
+public:
+    bool wordBreak(string s, vector<string>& wordDict) {
+        unordered_set<string> wordSet(wordDict.begin(), wordDict.end());
+        vector<int> memo(s.size(), -1);
+        return check(s, wordSet, 0, memo);
+    }
+
+    bool check(string s, unordered_set<string>& wordSet, int start, vector<int>& memo) {
+        if (memo[start] != -1) return memo[start];
+        for (int i = start; i < s.size(); i++) {
+            string temp = s.substr(start, i - start + 1);
+            if (wordSet.count(temp) && check(s, wordSet, i + 1, memo))
+                return memo[start] = 1;
+        }
+        return memo[start] = 0;
+    }
+
+    bool wordBreak(string s, vector<string>& wordDict) {
+        unordered_set<string> wordSet(wordDict.begin(), wordDict.end());
+        vector<bool> dp(s.size() + 1);
+        dp[0] = true;
+        for (int i = 0; i < dp.size(); i++) {
+            for (int j = 0; j < i; j++) {
+                if (dp[j] && wordSet.count(s.substr(j, i - j))) {
+                    dp[i] = true;
+                    break;
+                }
+            }
+        }
+        return dp.back();
+    }
+};
+
+class SolutionT1710 {
+public:
+    int maximumUnits(vector<vector<int>>& boxTypes, int truckSize) {
+        sort(boxTypes.begin(), boxTypes.end(), [](vector<int> a, vector<int> b) {
+            return a[1] > b[1];
+        });
+        int res = 0;
+        for (auto t : boxTypes) {
+            if (t[0] <= truckSize) {
+                res += t[0] * t[1];
+                truckSize -= t[0];
+            }
+            else {
+                res += truckSize * t[1];
+                return res;
+            }
+        }
+        return res;
+    }
+
+    //桶排序
+    int maximumUnits(vector<vector<int>>& boxTypes, int truckSize) {
+        vector<int> buckets(1001, -1);
+        int space_remaining_boxes = truckSize;
+        int units_loaded = 0;
+        for (int i = 0; i < boxTypes.size(); ++i) {
+            if (buckets[ boxTypes[i][1] ] == -1) {
+                buckets[ boxTypes[i][1] ] = boxTypes[i][0];
+            } else { // already has a value
+                buckets[ boxTypes[i][1] ] += boxTypes[i][0];
+            }
+            
+            // optimization idea: when populating, track the highest and lowest boxesperunit for use as indices below
+        }
+        
+        for (int i = 1000; i >= 0; --i) {
+            if (buckets[i] == -1) continue;
+            
+            if (buckets[i] > space_remaining_boxes) { // case:not enough space on truck. eg., we have 2 box but truck space 1.
+                units_loaded += space_remaining_boxes*i;
+                return units_loaded;
+            } else {
+                units_loaded += buckets[i]*i; // i is 10units/box. buckets[i] is 2 boxes. total units is 20.
+                space_remaining_boxes -= buckets[i]; // space_remaining is in units of boxes.
+            }
+            
+        }
+        return units_loaded;
+    }
+};
+
+
 

@@ -285,3 +285,192 @@ public:
         return dp[m];
     }
 };
+
+class SolutionT139 {
+public:
+    bool wordBreak(string s, vector<string>& wordDict) {
+        vector<int> dp(s.size() + 1);
+        dp[0] = 1;
+        for (int i = 0; i <= s.size(); i++) {
+            for (int j = 0; j <= wordDict.size(); j++) {
+                string t = wordDict[j];
+                int len = t.size();
+                if (i - len >= 0 && s.substr(i - len, len) == t ) {
+                    dp[i] = dp[i - len];
+                }
+            }
+        }
+        return dp.back();
+
+        // for (int i = 0; i < wordDict.size(); i++) {
+        //     string t = wordDict[i];
+        //     int len = t.size();
+        //     for (int j = len; j < s.size(); j++) {
+        //         if (s.substr(j - len, len) == t) {
+        //             dp[j] = dp[j - len];
+        //         }
+        //     }
+        // }
+        // return dp.back();
+    }
+};
+
+class SolutionT121 {
+public:
+    int maxProfit(vector<int>& prices) {
+        int res = INT_MIN, buy = INT_MAX;
+        for (int i = 0; i < prices.size(); i++) {
+            buy = min(buy, prices[i]);
+            res = max(res, prices[i] - buy);
+        }
+        return res;
+    }
+};
+
+class SolutionT122 {
+public:
+    int maxProfit(vector<int>& prices) {
+        int res = 0, buy = INT_MAX;
+        for (int i = 0; i < prices.size(); i++) {
+            if (prices[i] > buy) {
+                res += prices[i] - buy;
+                buy = INT_MAX;
+            } else {
+                buy = min(buy, prices[i]);
+            }
+        }
+    }
+};
+
+class SolutionT123 {
+public:
+    int maxProfit(vector<int>& prices) {
+        // 0 表示不持有，1表示持有
+        int n = prices.size(), k = 2;
+        vector<vector<vector<int>>> dp(n, vector<vector<int>> (k+1, vector<int> (2, 0)));
+        for (int i = 0; i <= n; i++) {
+            dp[i][0][0] = 0;
+            dp[i][0][1] = INT_MIN;
+        }
+        for (int p = 0; p <= k; p++) {
+            dp[0][k][0] = 0;
+            dp[0][k][1] = INT_MIN;
+        }
+        for (int i = 0; i < n; i++) {
+            for (int j = k; j >= 1; j--) {
+                dp[i][k][0] = max(dp[i -1][k][0], dp[i - 1][k][1] + prices[i]);
+                dp[i][k][1] = max(dp[i - 1][k][1], dp[i - 1][k-1][0] - prices[i]);
+            }
+        }
+        return dp[n - 1][k][0];
+    }
+};
+
+class SolutionT188 {
+public:
+    int maxProfit(int K, vector<int>& prices) {
+        int n = prices.size();
+        if(K >= n / 2) {                        //等价于交易次数无限，K的限制无效，单独处理
+            int res = 0;
+            for(int i = 0; i + 1 < n; ++i) {
+                if(prices[i + 1] > prices[i]) {
+                    res += prices[i + 1] - prices[i];
+                }
+            }
+            return res;
+        }
+        vector<vector<vector<int>>> dp(n, vector<vector<int>>(K + 1, vector<int>(2)));
+        for(int i = 0; i < n; ++i) {
+            for(int k = 1; k <= K; ++k) {
+                if(i == 0) {                              //边界情况，i为0时i - 1越界，单独处理
+                    dp[i][k][0] = 0;
+                    dp[i][k][1] = -prices[i];
+                    continue;
+                }
+                dp[i][k][0] = max(dp[i - 1][k][0], dp[i - 1][k][1] + prices[i]);
+                dp[i][k][1] = max(dp[i - 1][k][1], dp[i - 1][k - 1][0] - prices[i]);
+            }
+        }
+        return dp[n - 1][K][0];                  //最后一天，进行K次交易，不持有股票的状态就是最大能够得到的利润
+    }
+};
+
+class SolutionT309 {
+public:
+    //为了套这个模板，把i-2给初始化出来
+    int maxProfit(vector<int>& prices) {
+        int n = prices.size();
+        vector<vector<int>> dp(prices.size(), vector<int> (2, 0));
+        for (int i = 0; i < prices.size(); i++) {
+            if (i == 0) {
+                dp[i][0] = 0;
+                dp[i][1] = -prices[i];
+                continue;
+            }
+            if (i == 1) {
+                dp[i][0] = max(dp[i - 1][0], prices[1] - prices[0]);
+                dp[i][1] = max(dp[i-1][1], -prices[i]);
+                continue;
+            }
+            if (i == 2) {
+                dp[i][0] = max(dp[i-1][0], max(prices[2] - prices[0], prices[2] - prices[1]));
+                dp[i][1] = max(-prices[i], dp[i-1][1]);
+                continue;
+            }
+            dp[i][0] = max(dp[i - 1][0], dp[i - 1][1] + prices[i]);
+            dp[i][1] = max(dp[i - 1][1], dp[i - 2][0] - prices[i]);
+        }
+        return dp[n-1][0];
+    }
+
+    int maxProfit(vector<int>& prices) {
+        int buy = INT_MIN, pre_buy = 0, pre_sell = 0, sell = 0;
+        for (auto price : prices) {
+            pre_buy = buy;
+            buy = max(pre_sell - price, pre_buy);
+            pre_sell = sell;
+            sell = max(pre_sell, pre_buy + price);
+        }
+        return sell;
+    }
+};
+
+class SolutionT256 {
+public:
+    int minCost(vector<vector<int>>& costs) {
+        int n = costs.size(), res = 0;
+        vector<vector<int>> dp(n, vector<int> (3, 0));
+        dp[0][0] = costs[0][0], dp[0][1] = costs[0][1], dp[0][2] = costs[0][2];
+        for (int i = 1; i < n; i++) {
+            for (int j = 0; j < 3; j++) {
+                dp[i][j] = min(dp[i - 1][(j + 1) % 3], dp[i - 1][(j + 2) % 3]) + costs[i][j] ;
+            }
+        }
+        return min(dp[n - 1][0], min(dp[n - 1][1], dp[n - 1][2]));
+    }
+};
+
+class SolutionT265 {
+public:
+    int minCostII(vector<vector<int>>& costs) {
+        int n = costs.size(), k = costs[0].size();
+        vector<vector<int>> dp(n, vector<int> (k, 0));
+        for (int i = 0; i < k; i++) {
+            dp[0][i] = costs[0][i];
+        }
+        for (int i = 1; i < n; i++) {
+            for (int j = 0; j < k; j++) {
+                int cur_min = INT_MAX;
+                for (int p = 0; p < k; p++) {
+                    if (p != j ) cur_min = min(cur_min, dp[i-1][p]);
+                }
+                dp[i][j] = cur_min + costs[i][j];
+            }
+        }
+        int res = INT_MAX;
+        for (int i = 0; i < k; i++) {
+            res = min(res, dp[n-1][i]);
+        }
+        return res;
+    }
+};

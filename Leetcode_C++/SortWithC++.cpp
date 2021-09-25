@@ -42,6 +42,7 @@ void qSort(vector<int> &arr) {
 //基于随机的快排
 //这里其实是找到kth最大
 class SolutionT215 {
+public:
     int partition(vector<int>& nums, int l, int r) {
         int pivot = nums[r];
         int i = l - 1;
@@ -57,6 +58,7 @@ class SolutionT215 {
         return i + 1;
     }
     // 基于随机的划分
+    
     int randomized_partition(vector<int>& nums, int l, int r) {
         int i = rand() % (r - l + 1) + l;
         swap(nums[r], nums[i]);
@@ -64,19 +66,15 @@ class SolutionT215 {
     }
     //注意 k一直指的是第k个
     void randomized_selected(vector<int>& arr, int l, int r, int k) {
-        if (l >= r) {
-            return;
-        }
+        if (l >= r) return ;
         int pos = randomized_partition(arr, l, r);
-        //指的是当前这个数，是在l，r范围内的第几个
-        int num = pos - l + 1;
-        //这里是一个对k的判断，决定接下来的排序方向，因为不用全部都排
-        if (k == num) {
-            return;
-        } else if (k < num) {
+        if (pos == k - 1) {
+            return ;
+        }
+        if (pos < k - 1) {
             randomized_selected(arr, l, pos - 1, k);
         } else {
-            randomized_selected(arr, pos + 1, r, k - num);
+            randomized_selected(arr, pos + 1, r, k - pos - 1);
         }
     }
 public:
@@ -88,6 +86,31 @@ public:
             vec.push_back(arr[i]);
         }
         return vec;
+    }
+};
+
+class Solution {
+public:
+    int findKthLargest(vector<int>& nums, int k) {
+        int left = 0, right = nums.size() - 1;
+        while (true) {
+            int pos = partition(nums, left, right);
+            if (pos == k - 1) return nums[pos];
+            if (pos > k - 1) right = pos - 1;
+            else left = pos + 1;
+        }
+    }
+    int partition(vector<int>& nums, int left, int right) {
+        int pivot = nums[left], l = left + 1, r = right;
+        while (l <= r) {
+            if (nums[l] < pivot && nums[r] > pivot) {
+                swap(nums[l++], nums[r--]);
+            }
+            if (nums[l] >= pivot) ++l;
+            if (nums[r] <= pivot) --r;
+        }
+        swap(nums[left], nums[r]);
+        return r;
     }
 };
 

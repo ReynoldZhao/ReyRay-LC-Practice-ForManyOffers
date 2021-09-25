@@ -1,10 +1,13 @@
- class SolutionT609(object):
+ from typing import Collection
+
+
+class SolutionT609(object):
     def findDuplicate(self, paths):
         """
         :type paths: List[str]
         :rtype: List[List[str]]
         """
-        map = collections.defaultdict(list)
+        map = Collection.defaultdict(list)
         for line in paths:
             data = line.split()
             root = data[0]

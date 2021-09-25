@@ -790,3 +790,1235 @@ public:
         }
     }
 };
+
+class Solution {
+public:
+    vector<int> sortArray(vector<int>& nums) {
+        quicksort(nums, 0, nums.size() - 1);
+        return nums;
+    }
+
+    void quicksort(vector<int> &nums, int start, int end) {
+        if (start >= end) return ;
+        int pivot = partition(nums, start, end);
+        if (start > pivot) quicksort(nums, start, pivot - 1);
+        if (end > pivot + 1)quicksort(nums, pivot + 1, end);
+    }
+
+    int random_partion(vector<int> &nums, int left, int right) {
+        int pos = rand() % (right - left + 1) + left;
+        swap(nums[pos], nums[right]);
+    }
+
+    int partition(vector<int> &nums, int left, int right) {
+        int pivot = nums[right];
+        int pos = left - 1;
+        for (int i = left; i < right; i++) {
+            if (nums[i] <= pivot) {
+                swap(nums[++pos], nums[i]);
+            }
+        }
+        swap(nums[right], nums[++pos]);
+        return pos;
+    }
+};
+
+class Solution {
+public:
+    int partition(vector<int>& nums, int l, int r) {
+        int pivot = nums[r];
+        int i = l - 1;
+        //起始点是 l - 1
+        //方便后面遍历，与swap交换，最稳妥的快排
+        for (int j = l; j <= r - 1; ++j) {
+            if (nums[j] <= pivot) {
+                i = i + 1;
+                swap(nums[i], nums[j]);
+            }
+        }
+        swap(nums[i + 1], nums[r]);
+        return i + 1;
+    }
+    // 基于随机的划分
+    
+    int randomized_partition(vector<int>& nums, int l, int r) {
+        int i = rand() % (r - l + 1) + l;
+        swap(nums[r], nums[i]);
+        return partition(nums, l, r);
+    }
+    //注意 k一直指的是第k个
+    void randomized_selected(vector<int>& arr, int l, int r, int k) {
+        if (l >= r) return ;
+        int pos = randomized_partition(arr, l, r);
+        if (pos == k - 1) {
+            return ;
+        }
+        if (pos < k - 1) {
+            randomized_selected(arr, l, pos - 1, k);
+        } else {
+            randomized_selected(arr, pos + 1, r, k - pos - 1);
+        }
+    }
+public:
+    vector<int> getLeastNumbers(vector<int>& arr, int k) {
+        srand((unsigned)time(NULL));
+        randomized_selected(arr, 0, (int)arr.size() - 1, k);
+        vector<int> vec;
+        for (int i = 0; i < k; ++i) {
+            vec.push_back(arr[i]);
+        }
+        return vec;
+    }
+};
+
+class Solution {
+public:
+    int trap(vector<int>& height) {
+        int res = 0;
+        stack<int> st;
+        for (int i = 0; i < height.size(); i++) {
+            if (st.empty() || height[i] < height[st.top()]) {
+                st.push(i);
+                continue;
+            }
+            while (height[i] > height[st.top()]) {
+                if (st.size() >= 2) {
+                    int cur = height[st.top()]; st.pop();
+                    int roof = min(height[i], height[st.top()]);
+                    res += (roof - cur) * (i - st.top() - 1);
+                }
+                else st.pop();
+            }
+            st.push(i);
+        }
+        return res;
+    }
+};
+
+class SolutionT76 {
+public:
+    string minWindow(string s, string t) {
+        unordered_map<int, int> map;
+        for (auto a : t) map[a]++;
+        int left = 0, minLen = INT_MAX, cnt = 0;
+        string res = "";
+        for (int i = 0; i < s.size(); i++) {
+            if (--map[s[i]] >= 0) cnt++;
+            while (cnt == t.size()) {
+                if (minLen > i - left + 1) {
+                    minLen = i - left + 1;
+                    res = s.substr(left, minLen);
+                }
+                if (++map[left++] > 0) --cnt;
+            }
+        }
+        return res;
+    }
+};
+
+class SolutionT440 {
+public:
+    /**
+     * @param A: an integer array
+     * @param V: an integer array
+     * @param m: An integer
+     * @return: an array
+     */
+    int backPackIII(vector<int> &A, vector<int> &V, int m) {
+        // write your code here
+        vector<int> dp(m + 1, 0);
+        int n = A.size();
+        for (int i = 0; i < n; i++) {
+            for (int j = A[i]; j <= m; j++) {
+                dp[j] = max(dp[j], dp[j - A[i]] + V[i]);
+            }
+        }
+        return dp[m];
+    }
+};
+
+class SolutionT562 {
+public:
+    /**
+     * @param nums: an integer array and all positive numbers, no duplicates
+     * @param target: An integer
+     * @return: An integer
+     */
+    int backPackIV(vector<int> &nums, int target) {
+        // write your code here
+        vector<int> dp(target + 1, INT_MIN);
+        dp[0] = 0;
+        int n = nums.size();
+        for (int i = 0; i < n; i++) {
+            for (int j = nums[i]; j <= target; j++) {
+                dp[j] = max(dp[j], dp[j - nums[i]] + 1);
+            }
+        }
+        return dp[target];
+    }
+
+    int backPackIV(vector<int> &nums, int target) {
+        int m = target;
+        vector<int> A = nums;
+        vector<vector<int>> F(nums.size() + 1, vector<int> (target + 1, 0));
+
+        F[0][0] = 1;
+        for (int i = 1; i <= A.size(); i++) {
+            for (int j = 0; j <= m; j++) {
+                int k = 0;
+                while (k * A[i - 1] <= j) {
+                    F[i][j] += F[i-1][j - A[i-1]*k];
+                    k+=1;
+                }
+            }
+        }
+        return F[A.size()][m];
+    }
+};
+
+class Solution {
+public:
+    /**
+     * @param nums: an integer array and all positive numbers
+     * @param target: An integer
+     * @return: An integer
+     */
+    int backPackV(vector<int> &nums, int target) {
+        // write your code here
+        int res = 0;
+        sort(nums.begin(), nums.end());
+        helper(nums, target, 0, res);
+        return res;
+    }
+    void helper(vector<int>& num, int target, int start, int& res) {
+        if (target < 0) return;
+        if (target == 0) { res++; return; }
+        for (int i = start; i < num.size(); ++i) {
+            helper(num, target - num[i], i + 1, res);
+        }
+    }
+
+    int backPackV(vector<int> &nums, int target) {
+        vector<int> dp(target + 1);
+        for (auto a : nums) {
+            for (int j = target; j >= a; j--) {
+                dp[j] += dp[j - a];
+            }
+        }
+        return dp[target];
+    }
+};
+
+class SolutionT564 {
+public:
+    /**
+     * @param nums: an integer array and all positive numbers, no duplicates
+     * @param target: An integer
+     * @return: An integer
+     */
+    int backPackVI(vector<int> &nums, int target) {
+        // write your code here
+        vector<int> dp(target + 1, 0);
+        dp[0] = 1;
+        int n = nums.size();
+        for (int i = 1; i <= target; i++) {
+            for (int j = 0; j < n; j++) {
+                if (j - nums[i] >= 0) dp[i] += dp[i - nums[j]];
+            }
+        }
+        return dp[target];
+    }
+};
+
+class SolutionT971 {
+public:
+    /**
+     * @param k1: The coefficient of A
+     * @param k2: The  coefficient of B
+     * @param c: The volume of backpack
+     * @param n: The amount of A
+     * @param m: The amount of B
+     * @param a: The volume of A
+     * @param b: The volume of B
+     * @return: Return the max value you can get
+     */
+    //dp[i][j] A类的前i个物品，B类的前j个物品，选择若干个可以得到的最大价值
+    long long getMaxValue(int k1, int k2, int c, int n, int m, vector<int> &a, vector<int> &b) {
+        // Write your code here
+        sort(a.begin(), a.end());
+        sort(b.begin(), b.end());
+        vector<vector<long long>> dp(n, vector<long long> (m, 0));
+        long long ans = 0;
+        long long aa[2011], bb[2011];
+        aa[0] = a[0], bb[0] = b[0];
+        for (int i = 1; i < n; i++) aa[i] = aa[i-1] + a[i];
+        for (int j = 1; j < m; j++) bb[j] = bb[j-1] + b[j];
+        for (int i =1; i < n; i++) {
+            dp[i][0] = dp[i-1][0] + k1 * (c - aa[i - 1]);
+            ans = max(ans, dp[i][0]);
+        }
+        for (int j =1; j < n; j++) {
+            dp[0][j] = dp[0][j-1] + k2 * (c - bb[j - 1]);
+            ans = max(ans, dp[0][j]);
+        }
+        for (int i = 1; i <= n; i++) {
+            for (int j = 1; j <= m; j++) {
+                if (aa[i-1] + bb[j-1] > c) break;
+                long long x = dp[i-1][j] + k1 * (c - aa[i-1] - bb[j-1]);
+                long long y = dp[i][j-1] + k2 * (c - aa[i-1] - bb[j-1]);
+                dp[i][j] = max(x, y);
+                ans = max(ans, dp[i][j]);
+            }
+        }
+        return ans;
+    }
+};
+
+class SolutionT474 {
+public:
+    int findMaxForm(vector<string>& strs, int m, int n) {
+        vector<vector<int>> dp(m + 1, vector<int>(n + 1, 0));
+        for (string str : strs) {
+            int zeros = 0, ones = 0;
+            for (char c : str) (c == '0') ? ++zeros : ++ones;
+            for (int i = m; i >= zeros; --i) {
+                for (int j = n; j >= ones; --j) {
+                    dp[i][j] = max(dp[i][j], dp[i - zeros][j - ones] + 1);
+                }
+            }
+        }
+        return dp[m][n];
+    }
+};
+
+class SolutionT395 {
+public:
+    int longestSubstring(string s, int k) {
+        int res = 0, n = s.size();
+        for (int cnt = 1; cnt <= 26; cnt++) {
+            int i = 0, start = 0, uniqueCnt = 0;
+            vector<int> charCnt(26);
+            while ( i < n ) {
+                bool isValid = false;
+                if (charCnt[s[i++] - 'a']++ == 0) uniqueCnt++;
+                while (uniqueCnt > cnt) {
+                    if (--charCnt[s[start++] - 'a'] == 0) uniqueCnt--;
+                }
+                for (int j = 0; j < 26; j++) {
+                    if (charCnt[j] > 0 && charCnt[j] < k) isValid = false;
+                }
+                if (isValid) res = max(res, i - start);
+            }
+        }
+    }
+};
+
+class Solution {
+public:
+    vector<int> findDiagonalOrder(vector<vector<int>>& nums) {
+        map<int, vector<int>> map;
+        int m = nums.size(), n = nums[0].size();
+        for (int j = 0; j < n; j++) {
+            for (int i = 0; i < m; i++) {
+                int key = i + j;
+                map[key].push_back(nums[i][j]);
+            }
+        }
+
+        // for (int i = 0; i < m; i++) {
+        //     for (int j = 0; j < nums[i].size(); j++) {
+        //         int key = i + j;
+        //         map[key].push_back(nums[i][j]);
+        //     }
+        // }
+
+        vector<int> res;
+        for (auto m : map) {
+            auto temp = m.second;
+            reverse(temp.begin(), temp.end());
+            for (auto t : temp) res.push_back(t);
+        }
+        return res;
+    }
+};
+
+class SolutionT463 {
+public:
+    int islandPerimeter(vector<vector<int>>& grid) {
+        int m = grid.size(), n = grid[0].size();
+        int res = 0;
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                if (grid[i][j] == 1) {
+                    res += 4;
+
+                    if (i - 1 >= 0 && grid[i-1][j] == 1) res--;
+                    if (i + 1 < m && grid[i+1][j] == 1) res--;
+                    if (j - 1 >= 0 && grid[i][j-1] == 1) res--;
+                    if (j + 1 < n && grid[i][j+1] == 1) res--;
+                }
+            }
+        }
+        return res;
+    }
+};
+
+class SolutionT1911 {
+public:
+    long long maxAlternatingSum(vector<int>& nums) {
+        int n = nums.size();
+        vector<vector<long long>> dp(n, vector<long long> (2, 0));
+        // 0 +, 1 -
+        dp[0][0] = nums[0];
+        for (int i = 1; i < n; i++) {
+            dp[i][0] = max(dp[i-1][0], dp[i-1][1] + nums[i]);
+            dp[i][1] = max(dp[i-1][1], dp[i - 1][0] - nums[i]);
+        }
+        return dp[n-1][0];
+    }
+};
+
+class SolutionT209 { 
+public: 
+    int minSubArrayLen(int s, vector<int>& nums) { 
+        int len = nums.size(), res = len + 1; 
+        vector<int> sums(len+1, 0);
+        for (int i = 1; i < len + 1; ++i) sums[i] = sums[i - 1] + nums[i - 1]; 
+        for (int i = 0; i < len + 1; ++i) { 
+            int right = searchRight(i + 1, len, sums[i] + s, sums); 
+            if (right == len + 1) break; 
+            if (res > right - i) res = right - i; 
+        } 
+        return res == len + 1 ? 0 : res; 
+    }
+
+    int searchRight(int left, int right, int key, vector<int> sums) {
+        while (left < right) {
+            int mid = (right - left) / 2 + left;
+            if (sums[mid] >= key) right = mid;
+            else left = mid + 1;
+        }
+        return right;
+    } 
+};
+
+class SolutionT480 {
+public:
+    vector<double> medianSlidingWindow(vector<int>& nums, int k) {
+        vector<double> res;
+        multiset<int> small, large;
+        for (int i = 0; i < nums.size(); ++i) {
+            if (i >= k) {
+                if (small.count(nums[i - k])) small.erase(small.find(nums[i - k]));
+                else if (large.count(nums[i - k])) large.erase(large.find(nums[i - k]));
+            }
+            if (small.size() <= large.size()) {
+                if (large.empty() || nums[i] <= *large.begin()) small.insert(nums[i]);
+                else {
+                    small.insert(*large.begin());
+                    large.erase(large.begin());
+                    large.insert(nums[i]);
+                }
+            } else {
+                if (nums[i] >= *small.rbegin()) large.insert(nums[i]);
+                else {
+                    large.insert(*small.rbegin());
+                    small.erase(--small.end());
+                    small.insert(nums[i]);
+                }
+            }
+            if (i >= (k - 1)) {
+                if (k % 2) res.push_back(*small.rbegin());
+                else res.push_back(((double)*small.rbegin() + *large.begin()) / 2);
+            }
+        }
+        return res;
+    }
+};
+
+class SolutionT567 {
+public:
+    bool checkInclusion(string s1, string s2) {
+        int n1 = s1.size(), n2 = s2.size(), cnt = n1, left = -1;
+        unordered_map<int, int> map;
+        for (auto s : s1) map[s]++;
+        for (int i = 0; i < n2; i++) {
+            if (map.count(s2[i]) == 0) {
+                while (left < i) {
+                    ++left;
+                    if (map.count(s2[left])) {
+                        map[s2[left]]++;
+                        if (map[s2[left]] > 0) cnt++;
+                    }
+                }
+                //此时 left = i, 下一轮 i = i + 1
+            }
+            else {
+                if (--map[s2[i]] >= 0) cnt--;
+                while (cnt == 0) {
+                    if (i - left == n1) return true;
+                    if (++map[s2[++left]] > 0) ++cnt;
+                }
+            }
+        }
+    }
+};
+
+class SolutionT727 {
+public:
+    string minWindow(string s1, string s2) {
+        int n1 = s1.size(), n2 = s2.size(), cnt = n1, left = 0, minLen = INT_MAX;
+        string res = "";
+        unordered_map<int, int> map;
+        for (auto s : s1) map[s]++;
+        for (int i = 0; i < n2; i++) {
+            --map[s2[i]];
+            if (map[s2[i]] >= 0 ) cnt--;
+            while (cnt == 0 && left < i) {
+                if (i - left + 1 < minLen) {
+                    minLen = i - left + 1;
+                    res = s2.substr(left, minLen);
+                }
+                if (++map[s2[left++]] > 0) cnt++;
+            }
+        }
+        return res;
+    }
+};
+
+class SolutionT727 {
+public:
+    string minWindow(string S, string T) {
+        int m = S.size(), n = T.size(), start = -1, minLen = INT_MAX;
+        vector<vector<int>> dp(m + 1, vector<int>(n + 1, -1));
+        for (int i = 0; i <= m; ++i) dp[i][0] = i;
+        for (int i = 0; i < )
+    }
+};
+
+class Solution {
+public:
+    int maxSubArray(vector<int>& nums) {
+        int res = INT_MIN, left = 0, temp_sum = 0;
+        for (int i = 0; i < nums.size(); i++) {
+            temp_sum += nums[i];
+            res = max(res, temp_sum);
+            while (temp_sum < 0 && left <= i)
+            {
+                temp_sum-=nums[left++];
+            }
+        }
+        return res;
+    }
+};
+
+class SolutionT53 {
+public:
+    int maxSubArray(vector<int>& nums) {
+        if (nums.size() == 1) return nums[0];
+        long long temp_min = nums[0];
+        long long sum = nums[0], res = nums[0];
+        for (int i = 1; i < nums.size(); i++) {
+            sum += nums[i];
+            res = max(max(res,sum), sum - temp_min);
+            temp_min = min(temp_min, sum);
+        }
+        return res;
+    }
+};
+
+class Codec {
+public:
+
+    // Encodes a tree to a single string.
+    string serialize(TreeNode* root) {
+        ostringstream out;
+        serialize(root, out);
+        return out.str();
+    }
+
+    // Decodes your encoded data to tree.
+    TreeNode* deserialize(string data) {
+        istringstream in;
+        return deserialize(in);
+    }
+private:
+    void serialize(TreeNode* root, ostringstream& out) {
+        if (root) {
+            out << root->val << ' ';
+            serialize(root->left, out);
+            serialize(root->right, out);
+        } else {
+            out << "# ";
+        }
+    }
+
+    TreeNode* deserialize(istringstream& in) {
+        string val;
+        in >> val;
+        if (val == "#") return nullptr;
+        TreeNode* root = new TreeNode(stoi(val));
+        root->left = deserialize(in);
+        root->right = deserialize(in);
+        return root;
+    }
+};
+
+class Codec {
+public:
+
+    // Encodes a tree to a single string.
+    string serialize(TreeNode* root) {
+        if (!root) return "#";
+        return to_string(root->val)+","+serialize(root->left)+","+serialize(root->right);
+    }
+
+    // Decodes your encoded data to tree.
+    TreeNode* deserialize(string &data) {
+        if (data[0] == "#") {
+            if (data.size() > 1) data = data.substr(2);
+            return nullptr;
+        } else {
+            TreeNode* root = new TreeNode(helper(data));
+            root->left = deserialize(data);
+            root->right = deserialize(data);
+            return root;
+        }
+    }
+private:
+    int helper(string &data) {
+        int pos = data.find(",");
+        data = data.substr(pos+1);
+        return stoi(data.substr(0, pos));
+    }
+};
+
+class Codec {
+public:
+    // Encodes a tree to a single string.
+    string serialize(TreeNode* root) {
+        if (root == nullptr) return "#";
+        return to_string(root->val)+","+serialize(root->left)+","+serialize(root->right);
+    }
+
+    // Decodes your encoded data to tree.
+    TreeNode* deserialize(string data) {
+        return mydeserialize(data);
+    }
+    TreeNode* mydeserialize(string& data) {
+        if (data[0]=='#') {
+            if(data.size() > 1) data = data.substr(2);
+            return nullptr;
+        } else {
+            TreeNode* node = new TreeNode(helper(data));
+            node->left = mydeserialize(data);
+            node->right = mydeserialize(data);
+            return node;
+        }
+    }
+private:
+    int helper(string& data) {
+        int pos = data.find(',');
+        int val = stoi(data.substr(0,pos));
+        data = data.substr(pos+1);
+        return val;
+    }
+};
+
+struct DirectedGraphNode {
+    int label;
+    vector<DirectedGraphNode *> neighbors;
+    DirectedGraphNode(int x) : label(x) {};
+};
+
+class SolutionT127 {
+public:
+    /**
+     * @param graph: A list of Directed graph node
+     * @return: Any topological order for the given graph.
+     */
+    vector<DirectedGraphNode*> topSort(vector<DirectedGraphNode*> graph) {
+        // write your code here
+        vector<DirectedGraphNode*> res;
+        if (graph.empty()) return res;
+        unordered_map<DirectedGraphNode*, int> map;
+        for (auto node : graph) {
+            for (auto t : node->neighbors) {
+                map[t]++;
+            }
+        }
+        queue<DirectedGraphNode*> q;
+        for (auto node : graph) {
+            if (map.count(node) == 0) { 
+                q.push(node); 
+                res.push_back(node);
+            }
+        }
+        while(!q.empty()) {
+            auto temp_node = q.front(); q.pop();
+            for (auto t : temp_node->neighbors) {
+                map[t]--;
+                if (map[t] == 0) {
+                    q.push(t);
+                    res.push_back(t);
+                }
+            }
+        }
+        return res;
+    }
+};
+
+class SolutionT630 {
+public:
+    int scheduleCourse(vector<vector<int>>& courses) {
+        priority_queue<int> pq;
+        sort(courses.begin(), courses.end(), [](vector<int>& a, vector<int> &b){ return a[1] < b[1];});
+        int cur_time = 0, res = 0;
+        for (auto course : courses) {
+            cur_time += course[0];
+            pq.push(course[0]);
+            if (cur_time > course[1]) {
+                cur_time -= pq.top(); pq.pop();
+            }
+        }
+        return pq.size();
+    }
+};
+
+class SolutionT490 {
+public:
+    vector<vector<int>> dirs{{0,-1},{-1,0},{0,1},{1,0}};
+    bool hasPath(vector<vector<int>>& maze, vector<int>& start, vector<int>& destination) {
+        return helper(maze, start[0], start[1], destination[0], destination[1]); 
+    }
+
+    bool helper(vector<vector<int>>& maze, int i, int j, int di, int dj) {
+        if (i == di && j == dj) return true;
+        bool res = false; 
+        int m = maze.size(), n = maze[0].size(); 
+        maze[i][j] = -1; 
+        for (auto dir : dirs) {
+            int x = i, y = j;
+            while ( x >= 0 && x < i && y >= 0 && y < j ) {
+                x += dir[0], y += dir[1];
+            }
+            x -= dir[0], y -= dir[1];
+            if (maze[x][y] != -1) 
+                res |= helper(maze, x, y, di, dj);
+        }
+        return res;
+    }
+};
+
+class SolutionT490 { 
+public: 
+    bool hasPath(vector<vector<int>>& maze, vector<int>& start, vector<int>& destination) { 
+        if (maze.empty() || maze[0].empty()) return true; 
+        int m = maze.size(), n = maze[0].size(); 
+        vector<vector<bool>> visited(m, vector<bool>(n, false)); 
+        vector<vector<int>> dirs{{0,-1},{-1,0},{0,1},{1,0}}; 
+        queue<pair<int, int>> q; 
+        q.push({start[0], start[1]}); 
+        visited[start[0]][start[1]] = true; 
+        while (!q.empty()) { 
+            auto t = q.front(); q.pop();
+            int x = t.first, y = t.second;
+            if (x == destination[0] && y == destination[1]) return true;
+            for (auto dir : dirs) {
+                int tx = x, ty = y;
+                while (tx >= 0 && tx < m && ty >= 0 && ty < n && maze[tx][ty] == 0) { 
+                    tx += dir[0]; ty += dir[1]; 
+                } 
+                tx -= dir[0]; ty -= dir[1]; 
+                if (!visited[tx][ty]) {
+                    visited[tx][ty] = true;
+                    q.push({tx, ty});
+                }
+            }
+
+        }
+        return false;
+    }
+};
+
+class SolutionT505 {
+public:
+    int shortestDistance(vector<vector<int>>& maze, vector<int>& start, vector<int>& destination) {
+        if (maze.empty() || maze[0].empty()) return -1; 
+        int m = maze.size(), n = maze[0].size(), res = INT_MAX; 
+        vector<vector<bool>> visited(m, vector<bool>(n, false)); 
+        vector<vector<int>> dirs{{0,-1},{-1,0},{0,1},{1,0}}; 
+        queue<vector<int>> q; 
+        q.push({start[0], start[1], 0}); 
+        visited[start[0]][start[1]] = true; 
+        while (!q.empty()) { 
+            auto t = q.front(); q.pop();
+            int x = t[0], y = t[1], step = t[2];
+            if (x == destination[0] && y == destination[1]) res = min(res, step);
+            for (auto dir : dirs) {
+                int tx = x, ty = y, ts = step;
+                while (tx >= 0 && tx < m && ty >= 0 && ty < n && maze[tx][ty] == 0) { 
+                    tx += dir[0]; ty += dir[1], ts++; 
+                } 
+                tx -= dir[0]; ty -= dir[1], ts--; 
+                if (!visited[tx][ty]) {
+                    visited[tx][ty] = true;
+                    q.push({tx, ty, ts});
+                }
+            }
+        }
+        return res == INT_MAX ? -1 : res;
+    }
+
+    int shortestDistance(vector<vector<int>>& maze, vector<int>& start, vector<int>& destination) {
+        int m = maze.size(), n = maze[0].size();
+        vector<vector<int>> dists(m, vector<int>(n, INT_MAX));
+        vector<vector<int>> dirs{{0,-1},{-1,0},{0,1},{1,0}};
+        queue<pair<int, int>> q;
+        q.push({start[0], start[1]});
+        dists[start[0]][start[1]] = 0;
+        while (!q.empty()) {
+            auto t = q.front(); q.pop();
+            for (auto d : dirs) {
+                int x = t.first, y = t.second, dist = dists[t.first][t.second];
+                while (x >= 0 && x < m && y >= 0 && y < n && maze[x][y] == 0) {
+                    x += d[0];
+                    y += d[1];
+                    ++dist;
+                }
+                x -= d[0];
+                y -= d[1];
+                --dist;
+                if (dists[x][y] > dist) {
+                    dists[x][y] = dist;
+                    if (x != destination[0] || y != destination[1]) q.push({x, y});
+                }
+            }
+        }
+        return dists[destination[0]][destination[1]];
+    }
+};
+
+class SolutionT505 { 
+public: 
+    int shortestDistance(vector<vector<int>>& maze, vector<int>& start, vector<int>& destination) { 
+        int m = maze.size(), n = maze[0].size(); 
+        vector<vector<int>> dists(m, vector<int>(n, INT_MAX)); 
+        vector<vector<int>> dirs{{0,-1},{-1,0},{0,1},{1,0}}; 
+        auto cmp = [](vector<int> &a, vector<int> &b) {
+            return a[2] > b[2];
+        };
+        priority_queue<vector<int>, vector<vector<int>>, decltype(cmp) > pq(cmp); 
+        pq.push({start[0], start[1], 0});
+        dists[start[0]][start[1]] = 0; 
+        while (!pq.empty()) {
+            auto t = pq.top(); pq.pop();
+            for (auto dir : dirs) { 
+                int x = t[0], y = t[1], dist = dists[t[0]][t[1]]; 
+                while (x >= 0 && x < m && y >= 0 && y < n && maze[x][y] == 0) { 
+                    x += dir[0]; 
+                    y += dir[1]; 
+                    ++dist; 
+                } 
+                x -= dir[0]; 
+                y -= dir[1]; 
+                --dist; 
+                if (dists[x][y] > dist) { 
+                    dists[x][y] = dist; 
+                    if (x != destination[0] || y != destination[1]) pq.push({x, y, dist}); 
+                } 
+            } 
+        }
+        int res = dists[destination[0]][destination[1]]; 
+        return (res == INT_MAX) ? -1 : res;
+    }
+};
+
+class SolutionT973 {
+public:
+    vector<vector<int>> kClosest(vector<vector<int>>& points, int K) {
+        auto cmp = [](vector<int> &p, vector<int> & q) {
+            return p[0] * p[0] + p[1] * p[1] < q[0] * q[0] + q[1] * q[1];
+        };
+        priority_queue<vector<int>, vector<vector<int>>, decltype(cmp)> pq;
+        for (vector<int>& point : points) {
+            pq.push(point);
+            if (pq.size() > K) {
+                pq.pop();
+            }
+        }
+        vector<vector<int>> ans;
+        while (!pq.empty()) {
+            ans.push_back(pq.top());
+            pq.pop();
+        }
+        return ans;
+    }
+private:
+    struct compare {
+        bool operator()(vector<int>& p, vector<int>& q) {
+            return p[0] * p[0] + p[1] * p[1] < q[0] * q[0] + q[1] * q[1];
+        }
+    };
+};
+
+class Solution {
+public:
+    vector<int> numIslands2(int m, int n, vector<vector<int>>& positions) {
+        vector<int> res; 
+        int cnt = 0; 
+        vector<int> roots(m * n, -1); 
+        vector<vector<int>> dirs{{0, -1}, {-1, 0}, {0, 1}, {1, 0}};
+        for (auto &pos : positions) {
+            int id = pos[0] * m + pos[1];
+            if (roots[id] != -1) {
+                res.push_back(cnt);
+                continue;
+            }
+            roots[id] = id;
+            ++cnt;
+            for (auto dir : dirs) {
+                int x = pos[0] + dir[0], y = pos[1] + dir[1], cur_id = n * x + y; 
+                if (x < 0 || x >= m || y < 0 || y >= n || roots[cur_id] == -1) continue; 
+                int p = findRoot(roots, cur_id), q = findRoot(roots, id);
+                if (p != q) {
+                    roots[p] = q;
+                    --cnt; 
+                }
+            }
+            res.push_back(cnt);
+        }
+        return res;    
+    }
+
+    int findRoot(vector<int>& roots, int id) {
+        return roots[id] == id ? id : findRoot(roots, id);
+    }
+};
+
+class SolutionT323 {
+public:
+    int countComponents(int n, vector<vector<int>>& edges) {
+        vector<int> roots(n, -1);
+        for (int i = 0; i < n; i++) roots[i] = i;
+        int res = n;
+        for (auto edge : edges) {
+            int a = edge[0], b = edge[1];
+            int p = findRoot(roots, a), q = findRoot(roots, b);
+            if (p != q) {
+                roots[p] = q;
+                res--;
+            }
+        }
+        return res;
+    }
+
+    int findRoot(vector<int>& roots, int id) {
+        return roots[id] == id ? id : findRoot(roots, roots[id]);
+    }
+};
+
+class SolutionT694 {
+public:
+    vector<vector<int>> dirs{{0,-1},{-1,0},{0,1},{1,0}};
+    int numDistinctIslands(vector<vector<int>>& grid) {
+        int m = grid.size(), n = grid[0].size();
+        set<vector<pair<int, int>>> res;
+        for (int i = 0; i < m; ++i) {
+            for (int j = 0; j < n; ++j) {
+                if (grid[i][j] != 1) continue;
+                vector<pair<int, int>> v;
+                helper(grid, i, j, i, j, v);
+                res.insert(v);
+            }
+        }
+        return res.size();
+    }
+
+    void helper(vector<vector<int>>& grid, int x0, int y0, int i, int j, vector<pair<int, int>>& v) {
+        int m = grid.size(), n = grid[0].size();
+        v.push_back({i - x0, j - y0});
+        grid[i][j] *= -1;
+        for (auto dir : dirs) {
+            int tx = i + dir[0], ty = j + dir[1];
+            if (tx < 0 || tx >= m || ty < 0 || ty >= n || grid[tx][ty] <= 0) continue;
+            helper(grid, x0, y0, tx, ty, v);
+        }
+    }
+};
+
+class Solution { 
+public: 
+    /** 
+     * @param grid: a chessboard included 0 (false) and 1 (true) 
+     * @param source: a point 
+     * @param destination: a point 
+     * @return: the shortest path  
+     */ 
+    struct Point {
+      int x;
+      int y;
+      Point() : x(0), y(0) {}
+      Point(int a, int b) : x(a), y(b) {}
+    };
+  
+    int shortestPath(vector<vector<bool>> &grid, Point &source, Point &destination) { 
+        // write your code here 
+        if (grid.empty() || grid[0].empty()) return -1; 
+        int n = grid.size(), m = grid[0].size(); 
+        if(source.x == destination.x && source.y == destination.y) 
+            return 0; 
+        vector<vector<int>> dirs = {{1,2},{1,-2},{-1,2},{-1,-2},{2,1},{2,-1},{-2,1},{-2,-1}}; 
+        queue<Point> q({{source.x, source.y}}); 
+        unordered_map<int, int> map{{source.x * m + source.y, 0}}; 
+        while (!q.empty()) { 
+            auto t = q.front(); q.pop(); 
+            for (auto dir : dirs ) { 
+                Point temp_p(t.x + dir[0], t.y + dir[1]); 
+                if(!isValidPath(grid, temp_p)) 
+                    continue; 
+                if(map.count(temp_p.x * m + temp_p.y)) 
+                    continue; 
+                map[temp_p.x * m + temp_p.y] = map[t.x * m + t.y] + 1; 
+                if(temp_p.x == destination.x && temp_p.y == destination.y) 
+                    return map[temp_p.x * m + temp_p.y]; 
+                q.push(temp_p); 
+            } 
+        }
+        return -1; 
+    } 
+    bool isValidPath(vector<vector<bool>> grid, Point p){ 
+        if(p.x < 0 || p.y < 0 || p.x >= grid.size() || p.y >= grid[0].size())
+            return false; 
+        if(grid[p.x][p.y] == true) 
+            return false; 
+        return true; 
+    } 
+};
+
+class Node {
+public:
+    int val;
+    vector<Node*> neighbors;
+    Node() {
+        val = 0;
+        neighbors = vector<Node*>();
+    }
+    Node(int _val) {
+        val = _val;
+        neighbors = vector<Node*>();
+    }
+    Node(int _val, vector<Node*> _neighbors) {
+        val = _val;
+        neighbors = _neighbors;
+    }
+};
+
+class SolutionT133 {
+public:
+    Node* cloneGraph(Node* node) {
+        unordered_map<Node*, Node*> map;
+        return helper(map, node);
+    }
+
+    Node* helper(unordered_map<Node*, Node*>& m, Node* node) {
+        if (!node) return nullptr;
+        if (m.count(node)) return m[node];
+        Node *clone = new Node(node->val);
+        m[node] = clone;
+        for (auto t : node->neighbors) {
+            clone->neighbors.push_back(helper(m, t));
+        }
+        return clone;
+    }
+};
+
+class SolutionT1306 {
+public:
+    unordered_set<int> set;
+    bool canReach(vector<int>& arr, int start) {
+        if (start >= 0 && start < arr.size() && set.insert(start).second) {
+            return arr[start] == 0 || canReach(arr, start - arr[start]) || canReach(arr, start + arr[start]);
+        }
+    }
+};
+
+class Solution {
+public:
+    bool canVisitAllRooms(vector<vector<int>>& rooms) {
+        vector<bool> visited(rooms.size(), -1);
+        queue<int> q({0});
+        while(!q.empty()) {
+            int index = q.front(); q.pop();
+            auto keys = rooms[index];
+            for (auto key : keys) {
+                if (visited[key] == true) continue;
+                q.push(key);
+            }
+            visited[index] == true;
+        }
+        int flag = false;
+        for (auto v : visited) if(!flag) return false;
+        return true;
+    }
+};
+
+class SolutionT261 { 
+public: 
+    bool validTree(int n, vector<pair<int, int>>& edges) { 
+        vector<vector<int>> g(n, vector<int>()); 
+        vector<bool> v(n, false); 
+        for (auto a : edges) { 
+            g[a.first].push_back(a.second); 
+            g[a.second].push_back(a.first); 
+        } 
+        if (!dfs(g, v, 0, -1)) return false;
+        for (auto a : v) if (!a) return false;
+        return true;
+    }
+
+    bool dfs(vector<vector<int>> &g, vector<bool> &v, int cur, int pre) { 
+        if (v[cur]) return false;
+        v[cur] = true;
+        for (auto a : g[cur]) {
+            if (a != pre) {
+                if (!dfs(g, v, a, cur)) return false;
+            }
+        }
+        return true;
+    }
+
+    bool validTree(int n, vector<pair<int, int>>& edges) { 
+        vector<unordered_set<int>> g(n, unordered_set<int>()); 
+        unordered_set<int> s{{0}}; 
+        queue<int> q{{0}}; 
+        for (auto a : edges) { 
+            g[a.first].insert(a.second); 
+            g[a.second].insert(a.first); 
+        }
+        while(!q.empty()) {
+            int t = q.front(); q.pop();
+            if (s.count(t)) return false;
+            for (auto a : g[t]) {
+                if (s.count(a)) return false;
+                s.insert(a);
+                q.push(a);
+                g[a].erase(t);
+            }
+        }
+        return true; 
+    }
+};
+
+class SolutionT624 {
+public:
+    /**
+     * @param s: a string
+     * @param dict: a set of n substrings
+     * @return: the minimum length
+     */
+    int minLength(string &s, unordered_set<string> &dict) {
+        // write your code here
+        int N = s.size(); 
+        if (N == 0) return 0; 
+        queue<string> q({s}); 
+        unordered_set<string> visited; 
+        int minLen = N;
+        while (!q.empty()) {
+            int t_size = q.size();
+            for (int i = 0; i < t_size; i++) {
+                string temp = q.front(); q.pop();
+                for (int j = 0; j < temp.size(); j++) {
+                    for (auto s : dict) {
+                        int pos = temp.find(s);
+                        while (pos != -1) {
+                            string new_s = temp.substr(0, pos) + temp.substr(pos + s.size());
+                            if (visited.find(new_s) == visited.end()) {
+                                visited.insert(new_s);
+                                q.push(new_s);
+                                minLen = min(minLen, int(new_s.size()));
+                            }
+                            pos = temp.find(s, pos + 1);
+                        }
+                    }
+                }
+            }
+        }
+        return minLen;
+    }
+
+    vector<int> choosingShops(int cntProducts, vector<vector<int>> quantities, vector<vector<int>> costs, vector<vector<int>> meals) {
+        priority_queue<int, vector<int>, greater<int>> pq;
+
+    }
+
+    int segmentsCovering(vector<vector<int>> seg) {
+        sort(seg.begin(), seg.end());
+        int n = seg.size(), res = 0, i = 0;
+        while (i < n) {
+            if (i == n - 1) {
+                res++;
+                i++;
+                continue;
+            }
+            if ( seg[i][1] < seg[i + 1][0] ) {
+                i++;
+                res++;
+            } else {
+                int og_end = seg[i][1];
+                i++;
+                while (i < n && og_end >= seg[i][0]) {
+                    i++;
+                }
+                res++;
+            }
+        }
+        return res;
+    }
+};
+
+class SolutionT1272 {
+public:
+    vector<vector<int>> removeInterval(vector<vector<int>>& intervals, vector<int>& toBeRemoved) {
+        vector<vector<int>> res;
+        for (auto interval : intervals) {
+            if (interval[1] <= toBeRemoved[0] || interval[0] >= toBeRemoved[1]) {
+                res.push_back(interval);
+            } else if (interval[0] >= toBeRemoved[0] && interval[1] <= toBeRemoved[1]) {
+                continue;
+            } else {
+                auto temp = interval;
+                if (temp[0] < toBeRemoved[0]) {
+                    if (temp[1] > toBeRemoved[1]) {
+                        res.push_back({temp[0], toBeRemoved[0]});
+                        res.push_back({toBeRemoved[1], temp[1]});
+                        continue;
+                    }
+                    else {
+                        temp[1] = toBeRemoved[0];
+                        res.push_back(temp);
+                        continue;
+                    }
+                } else {
+                    temp[0] = toBeRemoved[1];
+                    res.push_back(temp);
+                    continue;
+                }
+            }
+        }
+        return res;
+    }
+
+    vector<vector<int>> removeInterval(vector<vector<int>>& intervals, vector<int>& toBeRemoved) {
+        vector<vector<int>> res;
+        auto start = toBeRemoved[0], end = toBeRemoved[1];
+        for (auto &v : intervals) {
+            if (v[1] <= start || v[0] >= end) res.push_back(v);
+            else {
+                if (v[0] < start) res.push_back({v[0], start});
+                if (v[1] > end) res.push_back({end, v[1]});
+            }
+        }
+        return res;
+    }
+};
