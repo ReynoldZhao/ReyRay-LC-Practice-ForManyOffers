@@ -1,38 +1,28 @@
-
-import heapq
+from Queue import PriorityQueue
 import collections
-from typing import Collection
+import heapq
+import functools
 
+# class T23Solution(object):
+#     def mergeKLists(self, lists):
+#         """
+#         :type lists: List[ListNode]
+#         :rtype: ListNode
+#         """
+#         dummy = listNode(None)
+#         cur = dummy
+#         q = PriorityQueue()
+#         for node : lists:
+#             if node:
+#                 q.put((node.val, node))
+#         while q.size() > 0:
+#             cur.next = q.get()[1]
+#             cur = cur.next
+#             if cur.next:
+#                 q.put((cur.next.val, cur.next))
+#         return dummy.next
 
-class Solution:
-    def reConstructBinaryTree(self, pre, tin):
-        if not pre or not tin:
-            return None
-        root = TreeNode(pre.pop(0))
-        index = tin.index(root.val)
-        root.left = self.reConstructBinaryTree(pre, tin[:index])
-        root.right = self.reConstructBinaryTree(pre, tin[index + 1:])
-        return root
-
-#python 构造一个有序的表 用bisect
-
-#python 构造堆
-#堆里面可以放两个 坐标加数值
-
-    def longestSubarray(self, A, limit):
-        maxq, minq = [], []
-        res = i = 0
-        for j, a in enumerate(A):
-            heapq.heappush(maxq, [-a, j])
-            heapq.heappush(minq, [a, j])
-            while -maxq[0][0] - minq[0][0] > limit:
-                i = min(maxq[0][1], minq[0][1]) + 1
-                while maxq[0][1] < i: heapq.heappop(maxq)
-                while minq[0][1] < i: heapq.heappop(minq)
-            res = max(res, j - i + 1)
-        return res
-
-//用了Counters
+@functools.total_ordering
 class Element:
     def __init__(self, count, word):
         self.count = count
@@ -45,6 +35,7 @@ class Element:
     
     def __eq__(self, other):
         return self.count == other.count and self.word == other.word
+
 #python的 heapq改写的大小比较顺序是自然顺序
 #由于pythonheapq只能是小顶堆，self.count < other.count，频率小的靠近堆顶
 #self.word > other.word，字符顺序大的靠近堆顶

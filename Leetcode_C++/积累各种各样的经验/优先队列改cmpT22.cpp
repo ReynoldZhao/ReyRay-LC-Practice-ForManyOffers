@@ -34,6 +34,31 @@ public:
     }
 };
 
+// 小顶堆
+// 这用的也是小顶堆
+// 总之就是和vector的sort相反， < 就是大的放前面，> 就是小的放前面
+// a.second > b.second，让频率小的放前面，a.first < b.first 让字母顺序大的放前面
+class SolutionT692 {
+public:
+    vector<string> topKFrequent(vector<string>& words, int k) {
+        vector<string> res(k);
+        unordered_map<string, int> freq;
+        auto cmp = [](pair<string, int>& a, pair<string, int>& b) {
+            return a.second > b.second || (a.second == b.second && a.first < b.first);
+        };
+        priority_queue<pair<string, int>, vector<pair<string, int>>, decltype(cmp) > q(cmp);
+        for (auto word : words) ++freq[word];
+        for (auto f : freq) {
+            q.push(f);
+            if (q.size() > k) q.pop();
+        }
+        for (int i = res.size() - 1; i >= 0; --i) {
+            res[i] = q.top().first; q.pop();
+        }
+        return res;
+    }
+};
+
 class SolutionT373 {
 public:
     vector<pair<int, int>> kSmallestPairs(vector<int>& nums1, vector<int>& nums2, int k) {
@@ -46,6 +71,7 @@ public:
         }
     } 
 
+
     vector<pair<int, int>> kSmallestPairs(vector<int>& nums1, vector<int>& nums2, int k) {
         vector<pair<int,int>> result;
         if (nums1.empty() || nums2.empty() || k <= 0)
@@ -54,6 +80,32 @@ public:
             return nums1[a.first] + nums2[a.second] > nums1[b.first] + nums2[b.second];};
         priority_queue<pair<int, int>, vector<pair<int, int>>, decltype(comp)> min_heap(comp);
     }
+};
+
+class SolutionT373 {
+public:
+    vector<pair<int, int>> kSmallestPairs(vector<int>& nums1, vector<int>& nums2, int k) {
+        vector<pair<int, int>> res;
+        priority_queue<pair<int, int>, vector<pair<int, int>>, cmp> q;
+        for (int i = 0; i < min((int)nums1.size(), k); ++i) {
+            for (int j = 0; j < min((int)nums2.size(), k); ++j) {
+                if (q.size() < k) {
+                    q.push({nums1[i], nums2[j]});
+                } else if (nums1[i] + nums2[j] < q.top().first + q.top().second) {
+                    q.push({nums1[i], nums2[j]}); q.pop();
+                }
+            }
+        }
+        while (!q.empty()) {
+            res.push_back(q.top()); q.pop();
+        }
+        return res;
+    }
+    struct cmp {
+        bool operator() (pair<int, int> &a, pair<int, int> &b) {
+            return a.first + a.second < b.first + b.second;
+        }
+    };
 };
     
 class Edge:

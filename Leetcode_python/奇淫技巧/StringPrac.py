@@ -13,8 +13,8 @@ class SolutionT609(object):
             root = data[0]
             for file in data[1:]:
                 name, _, content = file.partition('(')
-                M[content[:-1]].append(root + '/' + name)
-        return [x for x in M.values if len(x) > 1]
+                map[content[:-1]].append(root + '/' + name)
+        return [x for x in map.values if len(x) > 1]
 
 #zip用的真好
 class SolutionT1436(object):

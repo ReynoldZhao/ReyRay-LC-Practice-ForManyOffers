@@ -282,6 +282,29 @@ public:
     }
 };
 
+// 889. Construct Binary Tree from Preorder and Postorder Traversal
+class Solution {
+public:
+    TreeNode* constructFromPrePost(vector<int>& pre, vector<int>& post) {
+        return buildTree(pre, 0, pre.size() - 1, post, 0, post.size()-1);
+    }
+    TreeNode *buildTree(vector<int> &preorder, int preLeft, int preRight, vector<int> &postorder, int pLeft, int pRight){
+        if (preLeft > preRight || pLeft > pRight) return NULL;
+        TreeNode* root = new TreeNode(preorder[preLeft]);
+        if (preLeft + 1 <= preRight) {
+            int leftRoot = preorder[preLeft + 1];
+            int i = 0;
+            for (i = pLeft; i <= pRight; i++) {
+                if (postorder[i] == leftRoot) break;
+            }
+            int leftLen = i - pLeft + 1;
+            root->left = buildTree(preorder, preLeft + 1, preLeft + leftLen, postorder, pLeft, pLeft + leftLen - 1);
+            root->right = buildTree(preorder, preLeft + leftLen + 1, preRight, postorder, pLeft + leftLen, pRight);
+        }
+        return root;
+    }
+};
+
 // 108. 将有序数组转换为二叉搜索树
 class SolutionT108 {
 public:

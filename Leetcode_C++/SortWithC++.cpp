@@ -291,7 +291,7 @@ void mSort(vector<int> &a)
 
 
 
-
+//T148 链表的归并快慢指针 有坑
 void MergeSort (int arr [], int low,int high) {
     if(low>=high) { return; } // 终止递归的条件，子序列长度为1
     int mid =  low + (high - low)/2;  // 取得序列中间的元素

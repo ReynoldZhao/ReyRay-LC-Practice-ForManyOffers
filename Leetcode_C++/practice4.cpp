@@ -2021,4 +2021,475 @@ public:
         }
         return res;
     }
+
+};
+
+class Solution {
+public:
+    int countArrangement(int n) {
+        vector<bool> visited(n + 1, false);
+        int res = 0;
+        dfs(visited, 1, res);
+        return res;
+    }
+
+    void dfs(vector<bool> &visited, int pos, int &res) {
+        int N = visited.size() - 1;
+        if (pos > N) {
+            res++;
+            return ;
+        }
+        for (int i = 1; i <= N; i++) {
+            if (visited[i]) continue;
+            if (visited[i] == false && (i % pos == 0 || pos % i == 0)) {
+                visited[i] = true;
+                dfs(visited, pos + 1, res);
+                visited[i] = false;
+            }
+        }
+    }
+};
+
+class SolutionT526 {
+public:
+    int countArrangement(int n) {
+        vector<int> arr(n + 1);
+        for (int i = 0; i <= n; i++) arr[i] = i;
+        return dfs(arr, n);
+    }
+
+    int dfs(vector<int> &arr, int pos) {
+        if (pos <= 1) return 1;
+        int res = 0;
+        for (int i = 1; i <= pos; i++) {
+            if (pos % arr[i] == 0 || arr[i] % pos == 0) {
+                swap(arr[i], arr[pos]);
+                res += dfs(arr, pos - 1);
+                swap(arr[i], arr[pos]);
+            }
+        }
+        return res;
+    }
+};
+
+class Solution {
+public:
+    int closestValue(TreeNode* root, double target) {
+        TreeNode *p = root;
+        int res = root->val;
+        double diff = numeric_limits<double>::max();
+        while (p) {
+            if ( abs(double(p->val) - target) <= diff ) {
+                res = p->val;
+            }
+            if (p->val < target) {
+                p = p->right;
+            } else if (p->val >= target) {
+                p = p->left;
+            }
+        }
+        return res;
+    }
+};
+
+class Solution {
+public:
+    /**
+     * @param root: the given BST
+     * @param p: the given node
+     * @return: the in-order predecessor of the given node in the BST
+     */
+    TreeNode * inorderPredecessor(TreeNode * root, TreeNode * p) {
+        // write your code here
+        if (!p) return nullptr; 
+        if (p->left) { 
+            TreeNode* temp = root->left; 
+            while(temp->right) { 
+                temp = temp->right; 
+            } 
+            return temp; 
+        } 
+        TreeNode* pre = nullptr;
+        while (root) {
+            if (root->val >= p->val) root = root->left;
+            else {
+                if (!pre || root->val > pre->val) {
+                    pre = root;
+                }
+                root = root->right;
+            }
+        }
+        return pre;
+    }
+};
+
+int binary(vector<int> a, int left, int right, int target) {
+    while (left < right) {
+        int mid = left + (right - left) / 2;
+        if (a[mid] < target) left = mid + 1;
+        else right = mid;
+    }
+    return right;
+}
+
+int maxArithmeticLength(vector<int> a, vector<int> b) {
+    int res = -1, na = a.size(), nb = b.size();
+    int max_gap = a[1] - a[0];
+    for (int i = 1; i <= max_gap; i++) {
+        int cur_aidx = 0, cur_bidx = 0, count = 0, cur_val = a[0];
+        bool flag = true;
+        while (cur_aidx < na) {
+            if (cur_aidx == na - 1) break;
+            if (a[cur_aidx] + i == a[cur_aidx + 1] || cur_val + i == a[cur_aidx + 1]) cur_aidx++;
+            else {
+                cur_val = a[cur_aidx];
+                int t_pos = binary(b, cur_bidx, nb, cur_val + i);
+                if (t_pos >= nb || b[t_pos] != cur_val + i) {
+                    flag = false;
+                    break;
+                }
+                cur_bidx = t_pos;
+                cur_val = b[t_pos];
+                count++;
+            }
+        }
+        if (flag && a.size() + count > res) res = a.size() + count;
+    }
+    return res;
+}
+
+class Solution {
+public:
+    /**
+     * @param root: the root of binary tree
+     * @return: the root of the minimum subtree
+     */
+    TreeNode * findSubtree(TreeNode * root) {
+        // write your code here
+        help(root);
+        return res;
+    }
+
+    int help(TreeNode* root) {
+        if (!root) return 0;
+
+        int sum = help(root->left) + help(root->right) + root->val;
+        if (sum <= minSum) {
+            minSum = sum;
+            res = root;
+        }
+        return sum;
+    }
+
+    bool isPal(string s, int l, int r) {
+        while (l <= r) {
+            if (s[l++] != s[r--]) return false;
+        }
+        return true;
+    }
+
+    bool constructorNames(string className, string methodName) {
+        unordered_map<char, int> map1;
+        unordered_set<char> set1;
+        multiset<int> set11;
+        unordered_map<char, int> map2;
+        unordered_set<char> set2;
+        multiset<int> set22;
+        if (className.size() != methodName.size()) return false;
+        for (int i = 0; i < className.size(); i++) {
+            map1[className[i]]++;
+            if (set1.count(className[i]) == 0) set1.insert(className[i]);
+        }
+        for (int i = 0; i < methodName.size(); i++) {
+            map2[methodName[i]]++;
+            if (set2.count(methodName[i]) == 0) set2.insert(methodName[i]);
+        }
+        if (set1 != set2) return false;
+        for (auto t : map1) {
+            set11.insert(t.second);
+        }
+        for (auto t : map2) {
+            set22.insert(t.second);
+        }
+        if (set11 != set22) return false;
+        return true;
+    }
+
+private:
+    TreeNode* res = nullptr;
+    int minSum = INT_MAX;
+};
+
+class Solution {
+public:
+    vector<vector<int>> permuteUnique(vector<int>& nums) {
+        vector<vector<int>> res;
+        sort(nums.begin(), nums.end());
+        vector<int> out, visited(nums.size(), 0);
+        backtracking(res, out, nums, 0, visited);
+        return res;
+    }
+    void backtracking(vector<vector<int>> &res, vector<int>& out, vector<int>& nums, int k, vector<int> &visited) {
+        if (k == nums.size()) {
+            res.push_back(out);
+            return ;
+        }
+        for (int i = 0; i < nums.size(); i++) {
+            if(visited[i] == 1 || (i > 0 && nums[i] == nums[i-1] && visited[i-1] == 0)) continue;
+            visited[i] = 1;
+            out.push_back(nums[i]);
+            backtracking(res, out, nums, k + 1, visited);
+            out.pop_back();
+            visited[i] = 0;
+        }
+        return ;
+    }
+
+    vector<bool> boundedRatio(vector<int> a, int l, int r) {
+        vector<bool> res(a.size(), false);
+        for (int i = 0 ; i < a.size() ; i++) {
+            double div = a[i] / (i + 1);
+            if (l <= div && div <= r && (a[i] % (i + 1)) == 0) res[i] = true;
+        }
+        return res;
+    }
+
+    bool isInc(vector<int> num) {
+        for (int i = 0; i < num.size() - 1; i++) {
+            if (num[i] >= num[i + 1]) return false;
+        }
+        return true;
+    }
+
+    bool makeIncreasing(vector<int> nums) {
+        int idx = 0, count = 0;
+        for (int i = 0; i < nums.size() - 1; i++) {
+            if (nums[i] >= nums[i + 1]) {
+                idx = i;
+                count++;
+            }
+        }
+        if (count == 0) return true;
+        if (count > 1) return false;
+        int org_num = nums[idx];
+        string t = to_string(nums[idx]);
+        for (int i = 0; i < t.size(); i++) {
+            string cur = t;
+            swap(cur[i], cur[(i + 1) % t.size()]);
+            while (cur[0] == '0') cur = cur.substr(1);
+            cout << cur + " first " << endl;
+            int newNum = stoi(cur);
+            nums[idx] = newNum;
+            if (isInc(nums)) return true;
+            nums[idx] = org_num;
+        }
+        idx = idx + 1;
+        if (idx < nums.size()) {
+            org_num = nums[idx ];
+            string t = to_string(nums[idx]);
+            for (int i = 0; i < t.size(); i++) {
+                string cur = t;
+                swap(cur[i], cur[(i + 1) % t.size()]);
+                while (cur[0] == '0') cur = cur.substr(1);
+                cout << cur + " second " << endl;
+                int newNum = stoi(cur);
+                nums[idx] = newNum;
+                if (isInc(nums)) return true;
+                nums[idx] = org_num;
+            }
+        }
+        return false;
+    }
+
+    string mergeStrings(string s1, string s2) {
+        unordered_map<char, int> set1, set2;
+        for (auto a : s1) set1[a]++;
+        for (auto a : s2) set2[a]++;
+        int m = s1.size(), n = s2.size(), p = 0, q = 0;
+        string res = "";
+        while (p < m && q < n) {
+            if (set1[s1[p]] == set2[s2[q]]) {
+                if (s1[p] < s2[q]) {
+                    res += s1[p++];
+                }
+                else {
+                    res += s2[q++]
+                }
+            } else if (set1[s1[p]] < set2[s2[q]]){
+                res += s1[p++];
+            } else {
+                res += s2[q++];
+            }
+        }
+        while (p < m) res += s1[p++];
+        while (q < n) res += s2[q++];
+        return res;
+    }
+
+    long long countDecreasingSubarrays(vector<int> arr) {
+        for (int i = 0; i < arr.size(); i++) {
+            for (int j = i + 1; j < arr.size(); j++) {
+
+            }
+        }
+        vector<long long> dp(arr.size(), 1);
+        dp[0] = 1;
+        for (int i = 1; i < arr.size(); i++) {
+            if (arr[i] < arr[i - 1]) {
+                dp[i] = dp[i] + dp[i-1];
+            }
+        }
+        long long res = 0;
+        for (int i = 0; i < arr.size(); i++) {
+            res += dp[i];
+        }
+        return res;
+    }
+};
+
+int dirX[8] = {1, 0, -1, 0, 1, 1, -1, -1};
+int dirY[8] = {0, -1, 0, 1, 1, -1, 1, -1};
+
+bool check(int curX, int curY, int X, int Y) {
+    if (curX <0 || curX >= X || curY < 0 || curY >= Y) return false;
+    return true;
+}
+
+void infect(vector<vector<bool>> &field, vector<vector<int>> &res, int x, int y) {
+    if (res[x][y] >= 0) return ;
+    int m = field.size(), n = field[0].size();
+    int near = 0;
+    for (int i = 0; i < 8; i++) {
+        int curX = x + dirX[i], curY = y + dirY[i];
+        if (check(curX, curY, m, n) && field[curX][curY] == true) {
+            near++;
+        }
+    }
+    if (near > 0) {
+        res[x][y] = near;
+        return ;
+    } else {
+        res[x][y] = 0;
+        for (int i = 0; i < 8; i++) {
+            int curX = x + dirX[i], curY = y + dirY[i];
+            if (check(curX, curY, m, n)){
+                infect(field, res, curX, curY);
+            }
+        }
+    }
+}
+
+vector<vector<int>> minesweeperClick(vector<vector<bool>> field, int x, int y) {
+    int m = field.size(), n = field[0].size();
+    vector<vector<int>> res(m, vector<int> (n, -1));
+    infect(field, res, x, y);
+    return res;
+}
+
+long long subarraysCountBySum(vector<int> arr, int k, long long s) {
+    int n = arr.size();
+    vector<long long> sum(n, 0);
+    unordered_map<long long, vector<int>> map;
+    map[0] = {-1};
+    for (int i = 0; i < n; i++) {
+        sum[i] = arr[i] + (i > 0 ? sum[i-1] : 0);
+        map[sum[i]].push_back(i);
+    }
+    long long res = 0;
+    for (int i = 0; i < n; i++) {
+        if (i == 0 && sum[i] == s) {
+            res++;
+            continue;
+        }
+        long long cur = sum[i];
+        if (map.count(cur - s) == 0) continue;
+        auto pos = map[cur - s];
+        for (auto p : pos) {
+            if (p > i) break;
+            cout << p<< endl;
+            cout << i << endl;
+            if (i - p + 1 <= k) res++;
+        }
+    }
+    return res;
+}
+
+class SolutionCS {
+    long long subarraysCountBySum(vector<int> arr, int k, long long s) {
+        unordered_map<long long, deque<int>> map;
+        long long sum = 0, res = 0;
+        map[0].push_back(-1);
+        for (int i = 0; i < arr.size(); i++) {
+            sum += arr[i];
+            if (map.count(sum - s)) {
+                while (i - map[sum - s].front() > k) map[sum - s].pop_front();
+                res += map[sum - s].size();
+            }
+            // 判空 while (i - map[sum].front() > k) map[sum].pop_front();
+            map[sum].push_back(i);
+        }
+        return res;
+    }
+};
+
+struct cmp {
+    bool operator() (vector<int> &a, vector<int> &b) {
+        if (a[0] == b[0]) {
+            if (a[1] == b[1]) {
+                return a[2] > b[2];
+            }
+            return a[1] > b[1];
+        }
+        return a[0] > b[0];
+    }
+};
+
+vector<vector<int>> meanAndChessboard(vector<vector<int>> matrix, vector<vector<int>> queries) {
+    int m = matrix.size(), n = matrix[0].size();
+    // auto cmp = [](vector<int> &a, vector<int> &b) {
+    //     return a[0] > b[0];
+    // };
+    vector<vector<int>> res = matrix;
+    
+    priority_queue<vector<int>, vector<vector<int>>, cmp> pqBlack;
+    priority_queue<vector<int>, vector<vector<int>>, cmp> pqWhite;
+    for (int i = 0; i < m ; i++) {
+        for (int j = 0; j < n; j++) {
+            if (i + j % 2== 0) pqWhite.push({matrix[i][j], i, j});
+            else pqBlack.push({matrix[i][j], i, j});
+        }
+    }
+    for (auto query : queries) {
+        int kBlack = query[0], kWhite = query[1];
+    }
+}
+
+struct ListNode {
+    int val;
+    ListNode *next;
+    ListNode() : val(0), next(nullptr) {}
+    ListNode(int x) : val(x), next(nullptr) {}
+    ListNode(int x, ListNode *next) : val(x), next(next) {}
+};
+
+class SolutionT1019 {
+public:
+    vector<int> nextLargerNodes(ListNode* head) {
+        vector<int> nums, res;
+        stack<int> st;
+        int pos = 0;
+        while (head) {
+            int curVal = head->val;
+            nums.push_back(curVal);
+            while (!st.empty() && curVal > nums[st.top()]) {
+                res[st.top()] = curVal;
+                st.pop();
+            }
+            st.push(pos);
+            pos++;
+            res.resize(pos);
+            head = head->next;
+        }
+        return res;
+    }
 };
