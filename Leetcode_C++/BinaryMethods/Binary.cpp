@@ -10,7 +10,7 @@
 #include<cstring>
 #include<string>
 #include<unordered_map>
-#include<hash_map>
+#include<ext/hash_map>
 #include<deque>
 using namespace std;
 
@@ -69,11 +69,11 @@ public:
 
 class SolutionT302 {
 public:
-    int minArea(vector<vector<char>>& image, int x, int y) {
+    int minArea(vector<vector<char> >& image, int x, int y) {
         
     }
 
-    int binarySearch(vector<vector<char>> &image, int left, int right, int range_start, int range_end, bool opt) {
+    int binarySearch(vector<vector<char> > &image, int left, int right, int range_start, int range_end, bool opt) {
         int k = range_start;
         while (left < right) {
             int mid = (right - left) / 2 + left;

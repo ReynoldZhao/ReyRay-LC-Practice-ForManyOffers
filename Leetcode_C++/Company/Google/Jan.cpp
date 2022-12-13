@@ -11,14 +11,14 @@
 #include<string>
 #include<unordered_map>
 #include<unordered_set>
-#include<hash_map>
+#include<ext/hash_map>
 #include<deque>
 using namespace std;
 
 class SolutionT528 {
 public:
     vector<int> s;
-    Solution(vector<int>& w) {
+    SolutionT528(vector<int>& w) {
         partial_sum(cbegin(w), cend(w), back_inserter(s));
     }
     

@@ -135,6 +135,28 @@ public void partition2(int[] nums, int low, int high) {
             }
         }
     }
+
+    int partition2(int[] nums, int low, int high) {
+        // write your code here
+        if (nums == null ||  nums.length == 0) {
+            return;
+        }
+        
+        int l = -1, i = 0, r = nums.length;
+        while (i < r) {
+        	// 如果当前数字小于low，那么就将其换到左边；
+        	// 由于我们已经保证了A(l, i]在low与high之间，所以交换完毕后，A[i]已经在low与high之间了，所以将i也右移
+        	// 如果当前数字大于high，则将其换到右边；如果当前数字在low与high直接，就直接右移i
+            if (nums[i] < low) {
+                swap(nums, i++, ++l);
+            } else if (nums[i] > high) {
+                swap(nums, i, --r);
+            } else {
+                i++;
+            }
+        }
+        return i - 1;
+    }
     
     private void swap(int[] nums, int i, int j) {
         int tmp = nums[i];

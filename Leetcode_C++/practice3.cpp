@@ -41,6 +41,7 @@ public:
         unordered_map<Node*, Node*> map;
         queue<Node*> q({node});
         Node *clone = new Node(node->val);
+        Node* temp = new Node(node->val);
         map[node] = clone;
         while(!q.empty()) {
             auto t = q.front(); q.pop();

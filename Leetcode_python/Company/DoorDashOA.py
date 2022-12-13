@@ -68,22 +68,22 @@ def web(items, sortParameter, sortOrder, itemsPerpage, pageNumber):
     return res
 
 
-job i 
-endTime[i]
-startTime < endTime[i] discarded
-job j
-startTime[j] >= endTime[i]
+# job i 
+# endTime[i]
+# startTime < endTime[i] discarded
+# job j
+# startTime[j] >= endTime[i]
 
-job         0   1   2   3
-starttime   1   2   3   3
-endtime     3   4   5   6
-        0
-       / \
-     1    2
-    / \   / \
-   2   X  3  X
-  / \
- 3   X
+# job         0   1   2   3
+# starttime   1   2   3   3
+# endtime     3   4   5   6
+#         0
+#        / \
+#      1    2
+#     / \   / \
+#    2   X  3  X
+#   / \
+#  3   X
 class SolutionT1235:
 #递归
 
@@ -131,16 +131,16 @@ class SolutionT1235:
         self.memo[start] = maxProfit
         return maxProfit 
 
-[0 1 2 3 4 5 6]
-             *
-maxProfit = 0
-[0 1 2 3 4 5 6]
-         *
-              ^ Binary Search next unconflict job
-        1.schduled      curProfit = profit[4] + memo[6] schduled 4 
-         2.skip 4       cur maxmimum profit memo[4 + 1]
-         memo[4] = max(curProfit, memo[4 + 1])
-memo[0]
+# [0 1 2 3 4 5 6]
+#              *
+# maxProfit = 0
+# [0 1 2 3 4 5 6]
+#          *
+#               ^ Binary Search next unconflict job
+#         1.schduled      curProfit = profit[4] + memo[6] schduled 4 
+#          2.skip 4       cur maxmimum profit memo[4 + 1]
+#          memo[4] = max(curProfit, memo[4 + 1])
+# memo[0]
 class SolutionT1235:
 #迭代
 
@@ -292,20 +292,20 @@ class Dijsktra:
 
         return ans
 
-(1,2,1)
-(2,3,1)
-(3,5,1)
-(1,4,1)
-(4,5,2)
-(3,4,2)
-(2,4,4)
+# (1,2,1)
+# (2,3,1)
+# (3,5,1)
+# (1,4,1)
+# (4,5,2)
+# (3,4,2)
+# (2,4,4)
 
-4 5
-(1,2,1),
-(1,3,1),
-(1,4,1),
-(2,3,1),
-(2,4,1)
+# 4 5
+# (1,2,1),
+# (1,3,1),
+# (1,4,1),
+# (2,3,1),
+# (2,4,1)
 
 class TreeNode:
     def __init__(self, val=0, left=None, right=None):

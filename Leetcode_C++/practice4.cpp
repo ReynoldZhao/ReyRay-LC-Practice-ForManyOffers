@@ -2493,3 +2493,161 @@ public:
         return res;
     }
 };
+
+class SolutionT15 {
+public:
+    vector<vector<int>> threeSum(vector<int>& nums) {
+        if (nums.size() < 3) return {};
+        sort(nums.begin(), nums.end());
+        if (nums[0] > 0) return {};
+        vector<vector<int>> res;
+        int n = nums.size() - 1;
+        for (int i = 0; i <= n-2; i++) {
+            if(i > 0 && nums[i] == nums[i - 1]) continue;
+            int t_target = 0 - nums[i], l = i + 1, r = n;
+            while (l < r) {
+                if (nums[l] + nums[r] == t_target) {
+                    res.push_back({nums[i], nums[l], nums[r]}); 
+                    while (l < r && nums[r] == nums[r - 1]) r--;
+                    while (l < r && nums[l] == nums[l + 1]) l++;
+                    l++; r--;
+                }
+                else if (nums[l] + nums[r] < t_target) l++;
+                else r--;
+            }
+
+        }
+        return res;
+    }
+    int findMax(vector<vector<int>>& arr, int rows, int mid, int& max){
+        int max_index = 0;
+        for (int i = 0; i < rows; i++) {
+            if (max < arr[i][mid]) {
+                // Saving global maximum and its index
+                // to check its neighbours
+                max = arr[i][mid];
+                max_index = i;
+            }
+        }
+        return max_index;
+    }
+
+    vector<int> findPeakRec(vector<vector<int>>& arr, int rows, int columns, int mid){
+        // Evaluating maximum of mid column. Note max is
+        // passed by reference.
+        int max = 0;
+        int max_index = findMax(arr, rows, mid, max);
+    
+        // If we are on the first or last column,
+        // max is a peak
+        if (mid == 0 || mid == columns - 1)
+            return vector<int>{max_index, mid};
+    
+        // If mid column maximum is also peak
+        if (max >= arr[max_index][mid - 1] && max >= arr[max_index][mid + 1])
+            return vector<int>{max_index, mid};
+    
+        // If max is less than its left
+        if (max < arr[max_index][mid - 1])
+            return findPeakRec(arr, rows, columns, mid - ceil((double)mid / 2));
+    
+        // If max is less than its left
+        // if (max < arr[max_index][mid+1])
+        return findPeakRec(arr, rows, columns, mid + ceil((double)mid / 2));
+    }
+
+    vector<int> findPeakGrid(vector<vector<int>>& mat) {
+        int rows = mat.size(), cols = mat[0].size();
+        return findPeakRec(mat, rows, cols, cols / 2);
+    }
+};
+
+class SolutionT718 {
+public:
+    int findLength(vector<int>& nums1, vector<int>& nums2) {
+        int l = nums1.size();
+        vector<vector<int>> dp(l + 1, vector<int>(l + 1, 0));
+        for (int i = 1; i <= l; i++) {
+            for (int j = 1; j <= l; j++) {
+                if (nums1[i - 1] == nums2[j - 1]) dp[i][j] = dp[i-1][j-1] + 1;
+            }
+        }
+        return dp[l][l];
+    }
+};
+
+class SolutionT424 {
+public:
+    int characterReplacement(string s, int k) {
+        int res = 0;
+        for (int i = 0; i < s.size(); i++) {
+            int rest = k, temp_res = 1;
+            for (int j = i + 1; j < s.size() && rest >= 0; j++) {
+                if (s[j] != s[i]) rest--;
+                if (rest >= 0) {
+                    temp_res++;
+                    res = max(res, temp_res);
+                }
+            }
+        }
+        int n = s.size();
+        for (int i = n - 1; i >= 0; i--) {
+            int rest = k, temp_res = 1;
+            for (int j = i - 1; j >= 0 && rest >= 0; j--) {
+                if (s[j] != s[i]) rest--;
+                if (rest >= 0) {
+                    temp_res++;
+                    res = max(res, temp_res);
+                }
+            }
+        }
+        return res;
+    }
+    int characterReplacement(string s, int k) {
+        unordered_map<int, int> map;
+        int res = 0, maxf = 0, start = 0;
+        for (int i = 0; i < s.size(); i++){
+            maxf = max(maxf, ++map[s[i]]);
+
+            while (i - start + 1 - maxf > k) {
+                map[s[start++]]--;
+            }
+            res = max(res, i - start + 1);
+        }
+        return res;
+    }
+};
+
+class Solution {
+public:
+    int numKLenSubstrNoRepeats(string s, int k) {
+        unordered_map<int, int> map;
+        int start = -1;
+        int res = 0;
+        for (int i = 0; i < s.size(); i++) {
+            if (map[s[i]] != 0) {
+                start = max(start, map[s[i]]);
+                map[s[i]] = i;
+            }
+            if (i - start >= k) res++;
+        }
+        return res;
+    }
+};
+
+class Solution {
+public:
+    int maximumMinimumPath(vector<vector<int>>& grid) {
+        int m = grid.size(), n = grid[0].size();
+        queue<vector<int>> q({0, 0, grid[0][0]});
+        unordered_set<int> visited;
+        visited.insert(0);
+        int res = 0;
+        while (!q.empty()) {
+            auto t = q.front(); q.pop();
+            if (t[0] == m - 1 && t[1] == n - 1) return res;
+            
+        }
+
+    }
+};
