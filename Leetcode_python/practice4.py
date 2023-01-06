@@ -2193,21 +2193,973 @@ class Solution:
                 res = level
         return level
 
-
-
+class Solution:
+    def findDuplicates(self, nums: List[int]) -> List[int]:
+        res = []
+        for i in range(len(nums)):
+            while nums[i] != nums[nums[i] - 1]:
+                val = nums[i]
+                ano = nums[val - 1]
+                nums[i], nums[val - 1] = ano, val
         
+        for i in range(len(nums)):
+            if nums[i] != i+1:
+                res.append(nums[i])
+        return res
         
+class Solution:
+    def rotate(self, matrix: List[List[int]]) -> None:
+        """
+        Do not return anything, modify matrix in-place instead.
+        """
+        n = len(matrix)
+        #layer
+        for i in range(n/2):
+            for j in range(n - 1 - i):
+                temp = matrix[i][j]
+                matrix[i][j] = matrix[n - 1 - j][i]
+                matrix[n - 1 - j][i] = matrix[n - 1 - i][n - 1 - j]
+                matrix[n - 1 - i][n - 1- j] = matrix[j][n - 1 - i]
+                matrix[j][n - 1 - i] = temp
 
+class Solution:
+    def spiralOrder(self, matrix: List[List[int]]) -> List[int]:
+        res = []
+        m = len(matrix)
+        n = len(matrix[0])
+        if m == 0 or n == 0:
+            return res
+        loop = (n+1)//2 if m > n else (m+1)//2
+        rLen, cLen = m, n
+        for i in range(loop):
+            for col in range(i, i + cLen):
+                res.append(matrix[i][col])
+            for row in range(i + 1, i + rLen):
+                res.append(matrix[row][i + cLen - 1])
+            if rLen == 1 or cLen == 1:
+                break
+            for col in range(i + cLen - 2, i - 1, -1):
+                res.append(matrix[rLen - 1 - i][col])
+            for row in range(i + rLen - 2, i, -1):
+                res.append(matrix[row][i])
+
+            rLen -= 2
+            cLen -= 2
+
+        return res
+
+# Definition for singly-linked list.
+class ListNode:
+    def __init__(self, val=0, next=None):
+        self.val = val
+        self.next = next
+
+class Solution:
+    def reverseKGroup(self, head: Optional[ListNode], k: int) -> Optional[ListNode]:
+        dummy = ListNode(-1)
+        dummy.next = head
+        ptr = dummy
+        num = 0
+        while ptr.next != None:
+            ptr = ptr.next
+            num+=1
+        pre = dummy
+        while num >= k:
+            cur = pre.next
+            for i in range(k):
+                t = cur.next
+                cur.next = t.next
+                t.next = pre.next
+                pre.next = t
+            pre = cur
+            num -= k
+        return dummy.next
+
+class Solution:
+    def partition(self, head: Optional[ListNode], x: int) -> Optional[ListNode]:
+        dummyLarge = ListNode(-1)
+        dummyLarge.next = head
+        lessTail = ListNode(-1)
+        newStart = lessTail
+        pre = dummyLarge
+        while (pre.next != None) :
+            if pre.next.val < x:
+                lessTail.next = pre.next
+                pre.next = pre.next.next
+                lessTail = lessTail.next
+                lessTail.next = None
+            else:
+                pre = pre.next
+        lessTail.next = dummyLarge.next
+        return newStart.next
+
+class Solution:
+    def reverseBetween(self, head: Optional[ListNode], left: int, right: int) -> Optional[ListNode]:
+        dummy = ListNode(-1)
+        pre = dummy
+        dummy.next = head
+        for i in range(left - 1):
+            pre = pre.next
+        cur = pre.next
+        for i in range(left, right):
+            t = cur.next
+            cur.next = t.next
+            t.next = pre.next
+            pre.next = t
+        return dummy.next
+
+
+class Node:
+    def __init__(self, x: int, next: 'Node' = None, random: 'Node' = None):
+        self.val = int(x)
+        self.next = next
+        self.random = random
+
+class Solution:
+    def copyRandomList(self, head: 'Optional[Node]') -> 'Optional[Node]':
+        nodeMap = defaultdict(Node)
+        cur = head
+        while cur != None:
+            t = Node(cur.val)
+            nodeMap[cur] = t
+            cur = cur.next
+        secondCur = head
+        while secondCur != None:
+            nodeMap[secondCur].next = nodeMap[secondCur.next]
+            nodeMap[secondCur].random = nodeMap[secondCur.random]
+            secondCur = secondCur.next
+        return nodeMap[head]
+
+class Solution:
+    def wordBreak(self, s: str, wordDict: List[str]) -> bool:
+        n = len(s)
+        dp = [False for i in range(n + 1)]
+        word_dict = defaultdict(wordDict)
+        wordSplit = s.split()
+        dp[0] = True
+        for i in range(n):
+            if dp[i] == False:
+                continue
+            for j in range(i+1, n+1):
+                if dp[i] == True and "".join(wordSplit[i:j+1] in word_dict):
+                    dp[j] == True
+        return dp[n]
+
+class Solution:
+    def wordBreak(self, s: str, wordDict: List[str]) -> bool:
+        n = len(s)
+        dp = [False for i in range(n + 1)]
+        # i is the length
+        word_dict = set(wordDict)
+        dp[0] = True
+        #possible length iterate
+        for i in range(n+1):
+            for j in range(i):
+                if dp[j] == True and s[j:i+1] in word_dict:
+                    dp[i] = True
+                    break
+        return dp[n]
+
+class Solution:
+    def wordBreak(self, s: str, wordDict: List[str]) -> bool:
+        wordSet = set(wordDict)
+        n = len(s)
+        memo = [False * n]
+
+        def dfs(pos:int):
+            if pos >= len(s):
+                return True
+            if memo[pos] == True:
+                return memo[pos]
+            for i in range(pos + 1, n+1):
+                if s[pos:i] in wordSet and dfs(i):
+                    memo[pos] = True
+                    return True
+            memo[pos] = False
+            return False
+        dfs(s, 0)
+        return memo[0]
+
+class Solution: 
+    def sortList(self, head: Optional[ListNode]) -> Optional[ListNode]:  
+        if not head or not head.next: 
+            return head 
+        fast, slow, pre = head, head, head 
+        while fast and fast.next:
+            pre = slow
+            slow = slow.next
+            fast = fast.next.next
+        pre.next = None
+
+        return self.merge(self.sortList(head), self.sortList(slow))
+    
+    def merge(self, l, r):
+        dummy = ListNode(-1)
+        cur = dummy
+        while (l != None and r != None):
+            if l.val < r.val:
+                cur.next = l
+                l = l.next
+            else:
+                cur.next = r
+                r = r.next
+            cur = cur.next
+        if l:
+            cur.next = l
+        if r:
+            cur.next = r
+        return dummy.next
+
+class Solution:
+    def reverseList(self, head: Optional[ListNode]) -> Optional[ListNode]:
+        dummy = ListNode(-1)
+        dummy.next = head
+        cur = head
+        while cur.next:
+            t = cur.next
+            cur.next = t.next
+            t.next = dummy.next
+            dummy.next = t
+        return dummy.next
+
+class Solution:
+    def isPalindrome(self, head: Optional[ListNode]) -> bool:
+        slow, fast = head, head
+        st = []
+        while fast.next != None and fast.next.next != None:
+            st.append(slow.val)
+            slow = slow.next
+            fast = fast.next.next
+        if fast.next == None:
+            st.pop()
+        while len(st) > 0:
+            if slow.val != st.pop():
+                return false
+            slow = slow.next
+        return True
+
+class Node:
+    def __init__(self, val=0, left=None, right=None, random=None):
+        self.val = val
+        self.left = left
+        self.right = right
+        self.random = random
+
+class Solution:
+    def __init__(self) -> None:
+        self.visited = {}
+
+    def copyRandomBinaryTree(self, root: 'Optional[Node]') -> 'Optional[NodeCopy]':
+        nodeMap = defaultdict(Node)
+        if root == None:
+            return None
+        ptr = root
+        st = []
+        while ptr or len(str) > 0:
+            if ptr:
+                generNode = Node(ptr.val)
+                nodeMap[ptr] = generNode
+                st.append(ptr)
+                ptr = ptr.left
+            else:
+                ptr = st.pop()
+                ptr = ptr.right
         
+        ptr = root
+        st = []
+
+        while ptr or len(str) > 0:
+            if ptr:
+                if ptr.left:
+                    nodeMap[ptr].left = nodeMap[ptr.left]
+                if ptr.right:
+                    nodeMap[ptr].right = nodeMap[ptr.right]
+                if ptr.random:
+                    nodeMap[ptr].random = nodeMap[ptr.random]
+                st.append(ptr)
+                ptr = ptr.left
+            else:
+                ptr = st.pop()
+                ptr = ptr.right
         
+        return nodeMap[root]
 
+class Solution:
+    def __init__(self):
+        self.visited = {}
+    def copyRandomBinaryTree(self, node: 'Node') -> 'NodeCopy':
+        if not node:
+            return node
+        if node in self.visited:
+            return self.visited[node]
+        clone_node = NodeCopy(node.val)
+        self.visited[node] = clone_node
+        clone_node.left = self.copyRandomBinaryTree(node.left)
+        clone_node.right = self.copyRandomBinaryTree(node.right)
+        clone_node.random = self.copyRandomBinaryTree(node.random)
 
+        return clone_node
 
-
-
-
-
+class Solution:
+    def longestConsecutive(self, nums: List[int]) -> int:
+        num_map = defaultdict(int)
+        res = 0
+        for n in nums:
+            if n in num_map:
+                continue
+            left = num_map[n - 1] if (n - 1) in num_map else 0
+            right = num_map[n + 1] if (n + 1) in num_map else 0
+            sum = left + 1 + right
+            num_map[n] = sum
+            res = max(res, sum)
+            num_map[n - left] = sum
+            num_map[n + right] = sum
+        return res
         
+class Solution:
+    def subarraySum(self, nums: List[int], k: int) -> int:
+        tSum = 0
+        sum_map = defaultdict(int)
+        res = 0
+        for n in nums:
+            tSum += N
+            sum_map[tSum] += 1
+            if (tSum - k) in sum_map:
+                res += sum_map[tSum - k]
+        return res
+
+class Solution:
+    def medianSlidingWindow(self, nums: List[int], k: int) -> List[float]:
+        res = []
+        smallHalf = [] #max heap
+        largeHalf = nums[:k] #min heap
+        heapq.heapify(largeHalf)
+        while len(smallHalf) < len(largeHalf):
+            heapq.heappush(smallHalf, -heapq.heappop(largeHalf))
+        
+        removals = collections.Counter()
+
+        idx = k - 1
+        while idx < len(nums):
+            res.append((largeHalf[0] - smallHalf[0]) * 0.5 if k % 2 == 0 else - smallHalf[0])
+            idx += 1
+
+            if idx == len(nums):
+                break
+            
+            out_num = nums[i - k]
+            in_num = nums[i]
+
+            balance = 0
+            balance += -1 if out_num <= -smallHalf[0] else 1
+            removals[out_num] += 1
+
+            #out num doesn't move out at this time
+
+            # only add one item
+
+            #balance just decide to push to where
+            if smallHalf and in_num <= -smallHalf[0]:
+                balance += 1
+                heapq.heappush(smallHalf, -in_num)
+            else:
+                balance -= 1
+                heapq.heappush(largeHalf, in_num)
+
+            # adjust two halves
+            if balance < 0:
+                heapq.heappush(smallHalf, -heapq.heappop(largeHalf))
+                balance += 1
+            if balance > 0:
+                heapq.heappush(largeHalf, -heapq.heappop(smallHalf))
+                balance -= 1
+            
+            #lazy removal
+            #only when the removal one is on the top, we remove it, since it doesn't influence the calculation of median, if it is not on the top, we use a dict to record which item should be removed
+            while smallHalf and removals[-smallHalf[0]]:
+                removals[-smallHalf[0]] -= 1
+                heapq.heappop(smallHalf)
+                
+            while largeHalf and removals[largeHalf[0]]:
+                removals[largeHalf[0]] -= 1
+                heapq.heappop(largeHalf)   
+
+        return res       
+
+class Solution:
+    def reorganizeString(self, s: str) -> str:
+        res = []
+        charCounter = collections.Counter()
+        for c in s:
+            charCounter[c] += 1
+        
+        (tk, tv) = charCounter.most_common()
+        if tv > (len(s) + 1) // 2:
+            return ""
+        
+        pq = [(-v, k) for k, v in charCounter.items()]
+        heapq.heapify(pq)
+
+        pre_char, pre_cnt = '', 0
+
+        while pq:
+            cur_cnt, cur_char = heapq.heappop(pq)
+            res += [cur_char]
+            cur_cnt += 1
+            if pre_cnt < 0:
+                heapq.heappush((pre_cnt, pre_char))
+            pre_cnt, pre_char = cur_cnt, cur_char
+        
+        res = ''.join(res)
+        return res
+
+class Solution:
+    def isValid(self, s: str) -> bool:
+        parenthesesMap = {')':'(', ']':'[', '}':'{'}
+        left = parenthesesMap.values()
+        st = []
+        for c in s:
+            if c in left:
+                st.append(c)
+            elif c in parenthesesMap:
+                if st[-1] != parenthesesMap[c]:
+                    return False
+                st.pop()
+        return len(st) == 0
+            
+class Solution:
+    def maximalRectangle(self, matrix: List[List[str]]) -> int:
+        m, n = len(matrix), len(matrix[0])
+        st = [0] * n
+        res = 0
+        for i in range(m):
+            for j in range(n):
+                if matrix[i][j] == "1":
+                    st[j] += 1
+            t = self.help(st)
+            res = max(res, t)
+        return res
+    
+    def help(self, nums:List[int]) -> int:
+        nums.append(0)
+        st = []
+        res = 0
+        for i in range(len(nums)):
+            while len(st) > 0 and nums[i] <= nums[st[-1]]:
+                height = nums[st[-1]]
+                st.pop()
+                width = i - st[-1] - 1 if len(st) > 0 else i
+                res = max(res, height * width)
+            st.append(i)
+        return res
+
+    def shortestSubsequence(arr, K):
+        n = len(arr)
+        reminders = {}
+        sum = [0] * n
+        min_len = float(inf)
+        for i in range(n):
+            sum[i] = (sum[i-1] if i > 0 else 0) + arr[i]
+            r = sum[i] % K
+            if r in reminders:
+                min_len = min(min_len, i - reminders[r])
+            reminders[r] = i
+        return min_len
+
+class Solution:
+    def calculate(self, s: str) -> int:
+        num = 0
+        sumSt = []
+        res = 0
+        n = len(s)
+
+        flag = 1
+
+        idx = 0
+
+        while idx < n:
+            if s[idx].isdigit():
+                num = num*10 + int(s[idx])
+            elif s[idx] in ['-', '+']:
+                res += flag * num
+                num = 0
+                flag = [-1, 1][s[idx] == '+']
+            elif s[idx] == '(':
+                sumSt.append(res)
+                sumSt.append(flag)
+                res = 0
+            elif s[idx] == ')':
+                res += flag * num
+                res *= sumSt.pop()
+                res += sumSt.pop()
+                num = 0
+        
+        return res + num * flag
+
+class Solution:
+    def calculate(self, s: str) -> int:
+        st = []
+        num = 0
+        flag = '+'
+        for c in s:
+            if c.isdigit():
+                num = num*10 + int(c)
+            elif c in ['-', '+', '*', '/']:
+                if flag == '+':
+                    st.append(num)
+                elif flag == '-':
+                    st.append(-num)
+                elif flag == '*':
+                    t = st.pop()
+                    st.append(t * num)
+                elif flag == '/':
+                    t = st.pop()
+                    r = abs(t) // num
+                    st.append(r if num > 0 else -r)
+                num = 0
+                flag = c
+        return sum(st)
+
+    def calculate(self, s: str) -> int:
+        num = 0
+        res = 0
+        sign = 1
+        st = []
+
+        idx = 0
+        while idx < len(s):
+            if s[idx].isdigit():
+                num = num * 10 + int(s[idx])
+            elif s[idx] in ['-', '+']:
+                res += sign * num
+                flag = -1 if s[idx] == '-' else 1
+                num = 0
+            elif s[idx] == '(':
+                st.append(res)
+                st.append(flag)
+                res = 0
+            elif s[idx] == ')':
+                res += flag * num
+                res *= st.pop()
+                res += st.pop()
+                num = 0
+
+            idx += 1
+        
+        return res + flag * num
+
+class Solution:
+    def decodeString(self, s: str) -> str: 
+        num = 0
+        str = []
+        numSt = []
+        strSt = []
+        idx = 0
+        while idx < len(s):
+            if s[idx].isdigit():
+                num = num * 10 + int(s[idx])
+            elif s[idx].isalpha():
+                str.append(s[idx])
+            elif s[idx] == '[':
+                numSt.append(num)
+                strSt.append("".join(str))
+                str = []
+            elif s[idx] == ']':
+                tNum = numSt.pop()
+                tStr = "".join(str)
+                str = []
+                str.append(strSt.pop())
+                for i in range(tNum):
+                    str.append(tStr)
+        return "".join(str)
+
+class Solution:
+    def lengthOfLIS(self, nums: List[int]) -> int:
+        st = []
+        for i in range(len(nums)):
+            if len(st) == 0 or nums[i] > st[-1]:
+                st.append(nums[i])
+            else:
+                l = 0
+                r = len(st)
+                while l < r:
+                    mid = (r - l) // 2 + l
+                    if st[mid] < nums[i]:
+                        l += 1
+                    else:
+                        r = mid
+                st[l] = nums[i]
+        return len(st)
+
+class Solution:
+    def maxSlidingWindow(self, nums: List[int], k: int) -> List[int]:
+        dq = collections.deque()
+        res = []
+        for i in range(len(nums)):
+            while len(dq) > 0 and i - dq[0] >= k:
+                dq.popleft()
+            while len(dq) > 0 and nums[i] >= nums[dq[-1]]:
+                dq.pop()
+            dq.append(i)
+            res.append(dp[0])
+        return res
+
+class Solution:
+    def solve(self, nums: List[int], M: int) -> int:
+        n = len(nums)
+        dp = [float(inf)] * n
+        sum = [0 for i in range(n)]
+        max_in_sub = [[0 for i in range(n)] for i in range(n)] 
+
+        dp[0] = nums[0]
+        for i in range(n):
+            sum[i] = (0 if i == 0 else sum[i-1]) + nums[i]
+        
+        for i in range(n):
+            cur_max = nums[i]
+            for j in range(i, n):
+                if nums[j] >= cur_max:
+                    cur_max = nums[j]
+                max_in_sub[i][j] = cur_max
+        
+        #nums[1 ... n]
+        for i in range(1, n):
+            #forward 0, 1, 2, ..., i - 1
+            for k in range(i+1):
+                if k == i and sum[i] <= M:
+                    dp[i] = max_in_sub[0][i]
+                elif i > k and (sum[i] - sum[i - k - 1]) <= M:
+                    dp[i] = min(dp[i], max_in_sub[i-k][i] + dp[i - k - 1])
+        
+        return dp[-1]
+
+
+class Solution:
+    def nextLargerNodes(self, head: Optional[ListNode]) -> List[int]:
+        st = []
+        p = head
+        cnt = 0
+        nums = []
+        while p:
+            cnt+=1
+            nums.append(p.val)
+            p = p.next
+
+        res = [0] * cnt
+        ptr = head
+        idx = 0
+        while ptr:
+            while len(st) > 0 and ptr.val > nums[st[-1]]:
+                cur_idx = st.pop()
+                res[cur_idx] = ptr.val
+            st.append(idx)
+            ptr = ptr.next
+            idx += 1
+        
+        return res
+
+
+class Solution:
+    def countComponents(self, n: int, edges: List[List[int]]) -> int:
+        root = [0 for i in range(n)]
+        for i in range(n):
+            root[i] = i
+        
+        def findRoot(root:List[int], p):
+            while p != root[p]:
+                p = root[p]
+            return p
+        
+        for edge in edges:
+            p = findRoot(root, edge[0])
+            q = findRoot(root, edge[1])
+            if p != q:
+                root[p] = q
+        
+        print(root)
+
+        return len(root)
+
+class Solution:
+    def numIslands(self, grid: List[List[str]]) -> int:
+        if (len(grid) == 0):
+            return 0
+        row, col = len(grid), len(grid[0])
+        self.count = sum(grid[i][j] == "1" for i in range(row) for j in range(col))
+        self.root = [i for i in range(row * col)]
+
+        def union(x, y):
+            pRoot = findRoot(x)
+            qRoot = findRoot(y)
+            if pRoot == qRoot:
+                return
+            self.root[qRoot] = pRoot
+            self.count -= 1
+
+        def findRoot(p):
+            while p != self.root[p]:
+                p = self.root[p]
+            return p
+        
+        for i in range(row):
+            for j in range(col):
+                if grid[i][j] == '0':
+                    continue
+                idx = i * row + j
+
+class Solution:
+    def numIslands2(self, m: int, n: int, positions: List[List[int]]) -> List[int]:
+        self.root = [i for i in range(m * n)]
+        self.count = 0
+        self.grid = [[0 for i in range(m)] for j in range(n)]
+        res = []
+    
+        def union(x, y):
+            pRoot = findRoot(x)
+            qRoot = findRoot(y)
+            if pRoot == qRoot:
+                return
+            self.root[qRoot] = pRoot
+            self.count -= 1
+
+        def findRoot(p):
+            while p != self.root[p]:
+                p = self.root[p]
+            return p
+        
+        def checkBoundary(x, y):
+            if x >= 0 and x < m and y >=0 and y < n:
+                return True
+            else:
+                return False
+        
+        dir = [[0, 1], [0, -1], [1, 0], [-1, 0]]
+
+        for p in positions:
+            self.grid[p[0]][p[1]] = 1
+            self.count += 1
+            for i in range(4):
+                newX = p[0] + dir[i][0]
+                newY = p[1] + dir[i][1]
+                if checkBoundary(newX, newY) and self.grid[newX][newY] == 1:
+                    union(newX * m + newY, p[0] * m + p[1])
+            res.append(self.count)
+        
+        return res
+
+class Solution:
+    def minMeetingRooms(self, intervals: List[List[int]]) -> int:
+        startTimes = sorted([t[0] for t in intervals])
+        endTimes = sorted([t[1] for t in intervals])
+        endIdx = 0
+        cnt = 0
+        res = 0
+        for i in range(len(startTimes)):
+            cnt += 1
+            while (endTimes[endIdx] <= startTimes[i]):
+                endIdx += 1
+                cnt -= 1
+            res = max(res, cnt)
+        return res
+    
+    def minMeetingRooms(self, intervals: List[List[int]]) -> int:
+        map = collections.defaultdict(int)
+        for interval in intervals:
+            map[interval[0]] += 1
+            map[interval[1]] -= 1
+        res = 0
+        cnt = 0
+        calculated = list(map.items())
+        calculated.sort(key=lambda i:i[0])
+        for k, v in calculated:
+            cnt += v
+            res = max(res, cnt)
+        return res
+    
+    def minMeetingRooms(self, intervals: List[List[int]]) -> int:
+        pq = []
+        intervals.sort(key=lambda i:i[0])
+        res = 0
+        for interval in intervals:
+            while len(pq) > 0 and interval[0] >= pq[0]:
+                heapq.heappop(pq)
+            heapq.heappush(pq, interval[1])
+            res = max(res, len(pq))
+        return res
+
+class Solution:
+    def minSubArrayLen(self, target: int, nums: List[int]) -> int:
+        l, r, sum = 0, 0, 0
+        res = len(nums) + 1
+        while r < len(nums):
+            while r < len(nums) and sum < target:
+                sum += nums[r]
+                r += 1
+            while l < r and sum >= target:
+                res = min(r - l + 1, res)
+                sum -= nums[l]
+                l += 1
+        return res if res < len(nums) + 1 else 0
+
+    def minSubArrayLen(self, target: int, nums: List[int]) -> int:
+        n = len(nums)
+        sum = [0 for i in range(n + 1)] #max index is n
+        res = n + 1
+        # i -> sum[i + 1]
+        for i in range(n + 1):
+            sum[i + 1] = nums[i] + sum[i]
+        
+        #find index, the first one great or equal
+        def find(left, right, target):
+            while left < right:
+                mid = sum[(right - left) // 2 + left]
+                if mid < target:
+                    left = mid + 1
+                else:
+                    right = mid
+            return right
+
+        for i in range(n + 1):
+            #iterate from 0 elements to n elments, index is 0, 1, 2, ... n
+            right = find(i + 1, n, sum[i] + target)
+            if right == n and sum[n] - sum[i] < target:
+                break
+            res = min(res, right - i)
+        
+        return res
+
+class Solution:
+    def findMaxAverage(self, nums: List[int], k: int) -> float:
+        n = len(nums)
+        left = min(nums)
+        right = max(nums)
+        sum = [0 for i in range(n + 1)]
+        while right - left >= 1e-5:
+            minSum = 0
+            mid = (right - left) /2 + left
+            check = False
+            for i in range(1, n + 1):
+                sum[i] = sum[i - 1] + nums[i - 1] - mid
+                if i - k >= 0 :
+                    minSum = min(sum[i - k], minSum)
+                if i - k >= 0 and sum[i] - minSum >= 0:
+                    check = True
+                    break
+            
+            if check:
+                left = mid
+            else:
+                right = mid
+        return left
+
+class Solution:
+    def sumSubarrayMins(self, arr: List[int]) -> int:
+        res = 0
+        st = []
+        mod = 10**9 + 7
+        INF = float(inf)
+        nums = [-INF] + arr + [-INF]
+        for i in range(len(nums)):
+            while len(st) > 0 and nums[i] < nums[st[-1]]:
+                end = st[-1]
+                st.pop()
+                nextEnd = st[-1]
+                #子数组个数 （end - nextEnd) 
+                res += nums[end] * (end - nextEnd) * (i - end)
+            st.append(i)
+    
+    def sumSubarrayMins(self, arr: List[int]) -> int:
+        res = 0
+        mod = 10**9 + 7
+        #递增栈
+        st = []
+        INF = float(inf)
+        A = [-INF] + arr + [-INF]
+        for k, v in enumerate(A):
+            while st and v < A[st[-1]]:
+                j = st[-1]
+                st.pop()
+                i = st[-1]
+                # 更更小a 更小i 小j    新值k
+                # 以arr[j]为最小的子数组的个数 (j - i) * (k - j)
+                # 可以理解成 以j为起点，左边取一个，右边从1 取到最大 k - j
+                # 然后左边取两个，...， 左边最多取（j - i)个
+                res += A[j] * (j - i) * (k - j)
+            st.append(k)
+        return res % mod
+
+class Solution:
+    def subArrayRanges(self, nums: List[int]) -> int:
+        st = []
+        INF = float(inf)
+        arr = [-INF] + nums + [-INF] 
+        res = 0
+        for i, v in enumerate(arr):
+            while len(st) > 0 and v < arr[st[-1]]:
+                end = st[-1]
+                st.pop()
+                new_end = st[-1]
+                res -= arr[end] * (end - new_end) * (i - end)
+            st.append(i)
+
+        st = []
+        arr = [INF] + nums + [INF]
+        for i, v in enumerate(arr):
+            while len(st) > 0 and v > arr[st[-1]]:
+                end = st[-1]
+                st.pop()
+                new_end = st[-1]
+                res += arr[end] * (end - new_end) * (i - end)
+            st.append(i)
+        return res
+
+class Solution:
+    def possibleBipartition(self, n: int, dislikes: List[List[int]]) -> bool:
+        root = [i for i in range(n)]
+
+        def union(x, y):
+            rootX = findRoot(x)
+            rootY = findRoot(y)
+            if rootX == rootY:
+                return False
+            else:
+                root[rootY] = rootX
+                return True
+
+        def findRoot(i):
+            while i != root[i]:
+                i = root[i]
+            return i
+        
+        for d in dislikes:
+            if not union(d[0], d[1]):
+                return False
+            
+        return True
+
+class Solution:
+    def isBipartite(self, graph: List[List[int]]) -> bool:
+        n = len(graph)
+        root = [i for i in range(n)]
+
+        def findRoot(i):
+            while i != root[i]:
+                i = root[i]
+            return i
+
+        for i in range(len(graph)):
+            x = i
+            y = graph[i][0]
+            rootX = findRoot(x)
+            rootY = findRoot(y)
+
+            for j in range(1, len(graph[i])):
+                rootTemp = findRoot(graph[i][j])
+                if rootTemp == rootX:
+                    return False
+                root[rootTemp] = rootY
+
+        return True
             
 
 
