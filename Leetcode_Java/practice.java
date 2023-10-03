@@ -30,7 +30,6 @@ class Solution {
         while(c1!=null && c2!=null){
             sum = sum/10;
             if(c1!=null){
-                sum += c1.
             }
         }
     }

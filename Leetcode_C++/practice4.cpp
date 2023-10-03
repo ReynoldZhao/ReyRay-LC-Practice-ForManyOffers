@@ -2651,3 +2651,46 @@ public:
 
     }
 };
+
+class Solution {
+public:
+    vector<int> solve(vector<int> nums, vector<vector<int>> questions) {
+        vector<int> res;
+        for(int i = 0; i < questions.size(); i++) {
+            vector<int> tmp_q = questions[i];
+            vector<int> tmp_subarray(nums.begin() + tmp_q[0], nums.begin() + tmp_q[1] + 1);
+            res.push_back(subarraysDivByK(tmp_subarray, tmp_q[2]));
+        }
+        return res;
+    }
+
+    int subarraysDivByK(vector<int>& nums, int k) {
+        int n = nums.size();
+        int prefixMod = 0, result = 0;
+
+        // There are k mod groups 0...k-1.
+        vector<int> modGroups(k);
+        modGroups[0] = 1;
+
+        for (int num : nums) {
+            // Take modulo twice to avoid negative remainders.
+            prefixMod = (prefixMod + num % k + k) % k;
+            // Add the count of subarrays that have the same remainder as the current
+            // one to cancel out the remainders.
+            result += modGroups[prefixMod];
+            modGroups[prefixMod]++;
+        }
+
+        return result;
+    }
+};
+
+int main() {
+    Solution s = Solution();
+    vector<int> nums = {1, 11, 12 ,23, 5};
+    vector<vector<int>> questions = {{0, 2, 12}, {1, 3, 23}};
+    vector<int> res = s.solve(nums, questions);
+    for(int i = 0; i < res.size(); i++ ) {
+        cout << res[i] << endl;
+    }
+}

@@ -3160,23 +3160,545 @@ class Solution:
                 root[rootTemp] = rootY
 
         return True
+
+class Solution:
+    def snakesAndLadders(self, board: List[List[int]]) -> int:
+        n = len(board)
+        cell = [None] * (n**2 + 1)
+        columns = list(range(0, n))
+        label = 1
+        for row in range(n-1, -1, -1):
+            for column in columns:
+                cell[label] = (row, column)
+                label += 1
+            columns.reverse()
+        q = deque([1])
+        dist = [-1] * (n**2 + 1)
+        while q:
+            cur = q.popleft()
+            for next in range(cur + 1, min(cur + 6, n**2) + 1):
+                row, col = cell[next]
+                destination = (board[row][col] if board[row][col] != -1 else next)
+                if dist[destination] == -1:
+                    dist[destination] = dist[cur] + 1
+                    q.append(destination)
+        return dist[n**2]
+
+class Solution:
+    def rankTeams(self, votes: List[str]) -> str:
+        ranking = [[] for i in range(26)]
+        for s in votes:
+            for index, c in enumerate(list(s)):
+                ranking[index].append(c)
+        
+        ranked = set()
+        res = []
+
+        for i in range(len(ranking)):
+            characters = list(Counter(ranking[i]).items())
+            characters.sort(key=lambda c:(c[1], c[0]))
+            for c_tuple in characters:
+                if c_tuple[0] not in ranked:
+                    res.append(c_tuple[0])
+        
+        return "".join(res)
+
+class Solution:
+    def minAvailableDuration(self, slots1: List[List[int]], slots2: List[List[int]], duration: int) -> List[int]:
+        common_interval = []
+        s1_idx, s2_idx = 0, 0
+        while s1_idx < len(slots1) and s2_idx < len(slots2):
+            s1_itv = slots1[s1_idx]
+            s2_itv = slots2[s2_idx]
+
+            while s1_itv[0] >= s2_itv[1]:
+                s2_idx += 1
+                s2_itv = slots2[s2_idx]
+
+            while s2_itv[0] >= s1_itv[1]:
+                s1_idx += 1
+                s1_itv = slots1[s1_idx]
             
+            # if s1_itv[0] <= s2_itv[0] and s1_itv[1] >= s2_itv[1]:
+            #     common_interval.append(s2_itv)
+            #     s1_idx += 1
+            #     s2_idx += 1
+            #     continue
 
+            # if s2_itv[0] <= s1_itv[0] and s2_itv[1] >= s1_itv[1]:
+            #     common_interval.append(s1_itv)
+            #     s1_idx += 1
+            #     s2_idx += 1
+            #     continue
 
+            new_itv = [max(s1_itv[0], s2_itv[0]), min(s1_itv[1], s2_itv[1])]
+            common_interval.append(new_itv)
+            s1_idx += 1
+            s2_idx += 1
+        
+        for c in common_interval:
+            if c[1] - c[0] >= duration:
+                return c
+        
+        return []
 
+class Solution:
+    def minAvailableDuration(self, slots1: List[List[int]], slots2: List[List[int]], duration: int) -> List[int]:
+        common_interval = []
+        s1_idx, s2_idx = 0, 0
+        while s1_idx < len(slots1) and s2_idx < len(slots2):
+            s1_itv = slots1[s1_idx]
+            s2_itv = slots2[s2_idx]
 
+            while s1_itv[0] >= s2_itv[1] and s2_idx < len(slots2):
+                s2_idx += 1
+                if s2_idx >= len(slots2):
+                    break
+                s2_itv = slots2[s2_idx]
 
-
-
-
-
+            while s2_itv[0] >= s1_itv[1] and s1_idx < len(slots1):
+                s1_idx += 1
+                if s1_idx >= len(slots1):
+                    break
+                s1_itv = slots1[s1_idx]
             
+            if s1_idx >= len(slots1) or s2_idx >= len(slots2):
+                return []
+            
+            if s1_itv[0] <= s2_itv[0] and s1_itv[1] >= s2_itv[1]:
+                common_interval.append(s2_itv)
+                s2_idx += 1
+                continue
+
+            if s2_itv[0] <= s1_itv[0] and s2_itv[1] >= s1_itv[1]:
+                common_interval.append(s1_itv)
+                s1_idx += 1
+                continue
+
+            new_itv = [max(s1_itv[0], s2_itv[0]), min(s1_itv[1], s2_itv[1])]
+            common_interval.append(new_itv)
+            if s1_itv[1] <= s2_itv[1]:
+                s1_idx += 1
+            if s1_itv[1] >= s2_itv[1]:
+                s2_idx += 1
+        
+        for c in common_interval:
+            if c[1] - c[0] >= duration:
+                return [c[0], c[0] + duration]
+        
+        return []
+        
+class Solution:
+    def minAvailableDuration(self, slots1: List[List[int]], slots2: List[List[int]], duration: int) -> List[int]:
+        i, j = 0, 0
+        m, n = len(slots1), len(slots2)
+        intersect_interval = []
+        slots1.sort()
+        slots2.sort()
+
+        while i < m and j < n:
+            if slots1[i][1] <= slots2[j][0]:
+                i += 1
+            elif slots2[j][1] <= slots2[i][0]:
+                j += 1
+            else:
+                if slots1[i][0] <= slots2[j][1] and slots1[i][1] >= slots2[j][1]:
+                    tmp_itv = [max(slots1[i][0], slots2[j][0]), min(slots1[i][1], slots2[j][1])]
+                    if tmp_itv[1] - tmp_itv[0] >= duration:
+                        return [tmp_itv[0], tmp_itv[0] + duration]
+                    intersect_interval.append([max(slots1[i][0], slots2[j][0]), min(slots1[i][1], slots2[j][1])])
+                    j += 1
+                else:
+                    if tmp_itv[1] - tmp_itv[0] >= duration:
+                        return [tmp_itv[0], tmp_itv[0] + duration]
+                    intersect_interval.append([max(slots1[i][0], slots2[j][0]), min(slots1[i][1], slots2[j][1])])
+                    i += 1
+        
+        return []
+
+class Solution:
+    def minIncrementForUnique(self, nums: List[int]) -> int:
+        nums.sort()
+        add_set = set()
+        rest = []
+        for n in nums:
+            if n not in add_set:
+                add_set.add(n)
+            else:
+                rest.append(n)
+        
+        idx = 0
+        res = 0
+
+        for i in range(rest[0] + 1, 10**5 + 1):
+            if idx < len(rest) and i not in add_set and i > rest[idx]:
+                add_set.add(i)
+                res += i - rest[idx]
+                idx += 1
+                if idx >= len(rest):
+                    break
+        
+        return res
+
+class Solution:
+    def numPairsDivisibleBy60(self, time: List[int]) -> int:
+        residual_map = defaultdict(int)
+        res = 0
+        for t in time:
+            residual = t % 60
+            if 60 - residual in residual_map:
+                res += residual_map[60 - residual]
+            residual_map[residual] += 1
+        return res
+
+class Solution:
+    def minRefuelStops(self, target: int, startFuel: int, stations: List[List[int]]) -> int:
+        if startFuel >= target:
+            return 0
+        
+        #错误的greedy 策略，每次选，当前可达范围内最大的一个station
+
+        #错误样例 
+        # 1000
+        # 299
+        # [[13,21],[26,115],[100,47],[225,99],[299,141],[444,198],[608,190],[636,157],[647,255],[841,123]]
+
+        #永远停留在440，到不了更远，中间加几次正向油，推进一下
+
+        stations.sort()
+        cur_range = startFuel
+        next_max_stat = 0
+        next_max_range = startFuel
+
+        idx = 0
+        res = 0
+        
+        while idx < len(stations):
+            while idx < len(stations) and stations[idx][0] <= cur_range:
+                tmp_next_range = stations[idx][0] + cur_range - stations[idx][0] + stations[idx][1]
+                if tmp_next_range >= target:
+                    return res + 1
+                if next_max_range <= tmp_next_range:
+                    next_max_range = tmp_next_range
+                    next_max_stat = idx
+                idx += 1
+
+            if next_max_range <= cur_range:
+                return -1
+            
+            res += 1
+            idx = next_max_stat + 1
+            cur_range = next_max_range
+
+        return -1 if cur_range < target else 0
+            
+class Solution:
+    def minRefuelStops(self, target: int, startFuel: int, stations: List[List[int]]) -> int:
+        stations.sort()
+        dp = [startFuel] + 0 * len(stations)
+
+        for idx, (location, fuel) in enumerate(stations):
+            for t in range(idx, -1, -1):
+                if dp[t] >= location:
+                    dp[t + 1] = max(dp[t+1], dp[t] + fuel)
+        
+        for i, d in enumerate(dp):
+            if d >= target:
+                return i
+            
+        return -1
+
+class Solution:
+    def maxPerformance(self, n: int, speed: List[int], efficiency: List[int], k: int) -> int:
+        res = 0
+        mod = 10 ** 9 + 7
+
+        for i in range(len(efficiency)):
+            bench_eff = efficiency[i]
+            temp_speed_sum = speed[i]
+            team_mem_cnt = 1
+
+            heap = []
+            for j in range(len(speed)):
+                if efficiency[j] >= bench_eff and j != i:
+                    heapq.heappush(heap, -speed[j])
+                
+            while team_mem_cnt < k:
+                new_speed = -heapq.heappop()
+                temp_speed_sum += new_speed
+            
+            res = max(res, (temp_speed_sum * bench_eff) % mod)
+        
+        return res
+
+class Solution:
+    def maxPerformance(self, n: int, speed: List[int], efficiency: List[int], k: int) -> int:
+        mod = 10 ** 9 + 7
+        member = zip(efficiency, speed)
+        member = sorted(member, key=lambda k:-k[0])
+
+        heap = []
+        res = 0
+
+        max_speed_sum = 0
+        for i in range(len(member)):
+            bench_eff = member[i][0]
+            cur_speed = member[i][1]
+
+            # when we have iterated k person
+            # the first k iteration will include all members since the previous efficieny is higher and the amount is less than k
+            if i > k - 1:
+                max_speed_sum -= heapq.heappop(heap)
+            heapq.heappush(heap, cur_speed)
+
+            # this is a must, since we based on this guy
+            max_speed_sum += cur_speed
+            res = max(res, max_speed_sum * bench_eff)
+        
+        return res % mod
+
+class Solution:
+    def maxPerformance(self, n: int, speed: List[int], efficiency: List[int], k: int) -> int:
+        modulo = 10 ** 9 + 7
+
+        # build tuples of (efficiency, speed)
+        candidates = zip(efficiency, speed)
+        # sort the candidates by their efficiencies
+        candidates = sorted(candidates, key=lambda t:t[0], reverse=True)
+
+        speed_heap = []
+        speed_sum, perf = 0, 0
+        for curr_efficiency, curr_speed in candidates:
+            # maintain a heap for the fastest (k-1) speeds
+            if len(speed_heap) > k-1:
+                speed_sum -= heapq.heappop(speed_heap)
+            heapq.heappush(speed_heap, curr_speed)
+
+            # calculate the maximum performance with the current member as the least efficient one in the team
+            speed_sum += curr_speed
+            perf = max(perf, speed_sum * curr_efficiency)
+
+        return perf % modulo
+
+class Solution:
+    def longestCommonSubsequence(self, text1: str, text2: str) -> int:
+        dp = [[0 for i in range(len(text1) + 1)] for j in range(len(text2) + 1)]
+        
+        for i in range(1, len(text1) + 1):
+            for j in range(1, len(text2) + 1):
+                if text1[i - 1] == text2[j - 1]:
+                    dp[i][j] = max(dp[i - 1][j - 1] + 1, dp[i][j])
+                else:
+                    dp[i][j] = max(dp[i-1][j], dp[i][j - 1])
+        
+        return dp[-1][-1]
+
+class Solution:
+    def maximumSubsequenceCount(self, text: str, pattern: str) -> int:
+        pattern_set = set(list(pattern))
+        pre_first = 0
+        after_second = 0
+
+        for t in text:
+            if t == pattern[1]:
+                after_second += 1
+
+        total_second = after_second
+        res = 0
+
+        for t in text:
+            if t in pattern_set:
+                if t == pattern[0]:
+                    pre_first += 1
+                    if pre_first > 0:
+                        res += after_second
+                else:
+                    after_second -= 1
+                # insert.append((pre_first, after_second))
+        
+        max_insert = max(pre_first, total_second)
+
+        return res + max_insert
 
 
+    def solve(nums: List[int], k):
+        number_set = set(nums)
+        nums.sort()
+        res = 0
+        for i in range(len(nums)):
+            cur = nums[i]
+            rest = k - cur
+            if rest < 0:
+                continue
+            else:
+                return
 
+class Solution:
+    def accountsMerge(self, accounts: List[List[str]]) -> List[List[str]]:
+        res = []
+        idx = 0
+        enumerate
+        email_dic = collections.defaultdict()
+        for acc in accounts:
+            acc_list = acc[1:]
+            merge = False
+            merge_idx = -1
+            for email in acc_list:
+                if email in email_dic:
+                    merge = True
+                    merge_idx = email_dic[email]
+            if merge:
+                for email in acc_list:
+                    if email not in email_dic:
+                        email_dic[email] = merge_idx
+                        res[merge_idx].append(email)
+            else:
+                res.append(acc)
+                for email in acc_list:
+                    email_dic[email] = idx
+                idx += 1
+        res.sort(key=lambda x:x[0])
+        for r in res:
+            r = r[0] + sorted(r[1:])
+        return res
 
+class UF:
+    def __init__(self, N) -> None:
+        self.parents = list(range(N))
+    def find_root(self, node):
+        while self.parents[node] != node:
+            node = self.parents[node]
+        return node
+    def union(self, child, parent):
+        self.parents[self.find_root(child)] = self.parents[self.find_root(parent)]
+    
+class Solution:
+    def accountsMerge(self, accounts: List[List[str]]) -> List[List[str]]:
+        uf = UF(len(accounts))
+        # UF 是用来找 用户的合并关系的
 
+        email_userIdx_map = collections.defaultdict()
+        # map 是用来 存储email和用户的归属关系的
+        for idx, (_, *emails) in enumerate(accounts):
+            for email in emails:
+                if email in email_userIdx_map:
+                    uf.union(idx, email_userIdx_map[email])
+                else:
+                    email_userIdx_map[email] = idx
+        
+        ans = collections.defaultdict(list)
+        for email, idx in email_userIdx_map.items():
+            ans[uf.find_root(idx)].append(email)
+        res = []
+        for idx, emails in ans.items():
+            res.append([accounts[idx][0]] + sorted(emails))
+        return res
 
+class Solution:
+    def characterReplacement(self, s: str, k: int) -> int:
+        map = collections.defaultdict(int)
+        l, maxCnt = 0, 0
+        res = 0
+        for r in range(len(s)):
+            char = s[r]
+            map[char] += 1
+            maxCnt = max(maxCnt, map[char])
+            if r - l + 1 - maxCnt <= k:
+                res = max(r - l + 1, res)
+            else:
+                map[s[l]] -= 1
+                l += 1
+        return res
 
+class Solution:
+    def lengthOfLongestSubstringKDistinct(self, s: str, k: int) -> int:
+        charCnt = collections.defaultdict(int)
+        l, res = 0, 0
+        dif = 0
+        for r in range(len(s)):
+            if charCnt[s[r]] == 0:
+                dif += 1
+            charCnt[s[r]] += 1
+            while dif > k:
+                charCnt[s[l]] -= 1
+                l += 1
+            res = max(res, r - l + 1)
+        return res
 
+class Solution:
+    def longestOnes(self, nums: List[int], k: int) -> int:
+        l, res, maxCnt = 0, 0, 0
+        curCnt = 0
+        for r in range(len(nums)):
+            if nums[r] == 1:
+                curCnt += 1
+                maxCnt = max(maxCnt, curCnt)
+            # if r - l + 1 - maxCnt < k:
+            #     res = max(res, r - l + 1)
+            # else:
+            #     if nums[l] == 1:
+            #         curCnt -= 1
+            #     l += 1
+            while r - l + 1 - maxCnt 
+        return res
+    
+class Solution:
+    def predictTheWinner(self, nums: List[int]) -> bool:
+        n = len(nums)
+        dp = [[0 for i in range(n)] for i in range(n)]
+        #dp[i][j] from i - j, player 1 
+        #dp[i][j] =  dp[i-1][j], dp[i][j-1]
+        for i in range(n):
+            dp[i][i] = nums[i]
+        for len in range(1, n):
+            for j in range(len, n):
+                return i,j
 
+class Solution:
+    def minimumSemesters(self, n: int, relations: List[List[int]]) -> int:
+        course_pre_counter = collections.defaultdict(int)
+        course_top = collections.defaultdict(list)
+        taken = set()
+        untaken = set()
+        for rel in relations:
+            course_pre_counter[rel[1]] += 1
+            course_top[rel[0]].append(rel[1])
+            untaken.add(rel[0])
+            untaken.add(rel[1])
+        total = len(untaken)
+        round = 0
+        while len(taken) != total:
+            temp_taken = []
+            for c in untaken:
+                if course_pre_counter[c] == 0:
+                    temp_taken.append(c)
+            if len(temp_taken) == 0:
+                return -1
+            for c in temp_taken:
+                for post in course_top[c]:
+                    course_pre_counter[post] -= 1
+                taken.add(c)
+                untaken.remove(c)
+            round += 1
+        return round
+    
+class Solution:
+    def verticalOrder(self, root: Optional[TreeNode]) -> List[List[int]]:
+        bfs_queue = collections.deque(int)
+        temp_res = [[] for i in range(-101, 101)]
+        if root:
+            bfs_queue.append((0, root))
+        while len(bfs_queue) > 0:
+            temp_len = len(bfs_queue)
+            for i in range(temp_len):
+                idx, node = bfs_queue.popleft()
+                temp_res[idx].append(node.val)
+                if node.left:
+                    bfs_queue.append((idx - 1, node.left))
+                if node.right:
+                    bfs_queue.append((idx + 1, node.right))
+        res = []
+        for i in range(-101, 101):
+            if len(temp_res[i]) > 0:
+                res.append(temp_res[i])
+        return res

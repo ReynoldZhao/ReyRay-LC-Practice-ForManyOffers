@@ -67,3 +67,63 @@ Person p2
 WHERE p1.id not IN (select min(id) as id from Person GROUP BY email)
 
 SELECT ROUND(AVG(CASE WHEN low_fats = 'Y' OR recyclable = 'Y' THEN 1 ELSE 0 END),2) AS PERCENTAGE
+
+select C.party, count(C.id)
+from
+    (select candidate_id as won_c_id, max(votes) as max_v from results group by constituency_id) T1
+    Candidates C
+where C.id = T1.won_c_id
+group by C.party
+
+select P.category, P.product_id, P.discount
+FROM Product P
+    (select product_id as pid, min(discount) as min_dis, category as cat
+    from Product
+    GROUP BY category
+    ORDER BY product_id des
+    LIMIT 1) T
+where P.product_id = T.pid
+order by category ASC
+
+
+
+select country.coutry_name, city.city_name, T.customer_number
+
+FROM
+    country
+    city
+    (select count(customer_id) as customer_number, city_id as cityId
+    from customer
+    GROUP BY city_id) T
+
+where 
+    T.cityId = city.id and
+    city.country_id = country.id and
+    T.customer_number > (SELECT (SELECT COUNT(id) from customer) / (SELECT COUNT(id) from city))
+
+select s1.score,
+(select count(DISTINCT score)
+from Scores S2
+where s1.score >= s2.score) as 'Rank'
+from Score s1
+ORDER BY s1.score DESC
+
+delete p2
+from Person p1 JOIN Person p2
+on p1.Email = p2.Email
+where p1.id < p2.id
+
+create function getNthHighestSalary(N INT) RETURNS INT
+begin
+declare M int;
+set M = N - 1;
+    return (
+        SELECT IFNULL((SELECT DISTINCT salary from Employee ORDER BY Salary Desc LIMIT M, 1), NULL)
+    );
+END
+
+select player_id, event_date as first_login
+from Activity
+GROUP BY player_id
+ORDER BY event_date
+LIMIT 1
