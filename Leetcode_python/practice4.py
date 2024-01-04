@@ -3702,3 +3702,204 @@ class Solution:
             if len(temp_res[i]) > 0:
                 res.append(temp_res[i])
         return res
+    
+class Solution:
+    def simplifyPath(self, path: str) -> str:
+        stack = []
+        for elem in path.split('/'):
+            if stack and elem == '..':
+               stack.pop()
+            elif elem not in {'.', '/', ''}:
+               stack.append(elem)
+        
+        return '/' + '/'.join(stack)
+
+class Node:
+    def __init__(self, key, val) -> None:
+        self.key = key
+        self.val = val
+        self.pre = None
+        self.next = None
+
+class LRUCache:
+
+    def __init__(self, capacity: int):
+        self.hash_map = collections.defaultdict()
+        self.head = Node('#', -1)
+        self.tail = Node('$', -1)
+        self.head.next = self.tail
+        self.tail.pre = self.head
+        self.quota = capacity
+
+    def get(self, key: int) -> int:
+        if key not in self.hash_map:
+            return -1
+        resultNode = self.hash_map[key]
+        result = resultNode.val
+
+        preNode = resultNode.pre
+        nextNode = resultNode.next
+        preNode.next = nextNode
+        nextNode.pre = preNode
+
+        secondHeadNode = self.head.next
+
+        self.head.next = resultNode
+        resultNode.pre = self.head
+        resultNode.next = secondHeadNode
+        secondHeadNode.pre = resultNode
+        return result
+
+
+    def put(self, key: int, value: int) -> None:
+        newNode = Node(key, value)
+
+        if key in self.hash_map:
+            oldNode = self.hash_map[key]
+            preNode = oldNode.pre
+            nextNode = oldNode.next
+
+            preNode.next = nextNode
+            nextNode.pre = preNode
+            self.quota += 1
+        elif self.quota == 0:
+            lastNode = self.tail.pre
+            prepreNode = self.tail.pre.pre
+
+            prepreNode.next = self.tail
+            self.tail.pre = prepreNode
+
+            del self.hash_map[lastNode.key]
+            self.quota += 1
+        firstNode = self.head.next
+
+        self.head.next = newNode
+        newNode.pre = self.head
+
+        newNode.next = firstNode
+        firstNode.pre = newNode
+
+        self.quota -= 1
+        self.hash_map[key] = newNode
+
+#Don't know why slower
+class Node:
+    def __init__(self, key, val) -> None:
+        self.key = key
+        self.val = val
+        self.pre = None
+        self.next = None
+
+class LRUCache:
+
+    def __init__(self, capacity: int):
+        self.hash_map = collections.defaultdict()
+        self.head = Node('#', -1)
+        self.tail = Node('$', -1)
+        self.head.next = self.tail
+        self.tail.pre = self.head
+        self.quota = capacity
+
+    def get(self, key: int) -> int:
+        if key not in self.hash_map:
+            return -1
+        resultNode = self.hash_map[key]
+        self._remove(resultNode)
+        self._add(resultNode)
+        result = resultNode.val
+        return result
+
+
+    def put(self, key: int, value: int) -> None:
+        newNode = Node(key, value)
+
+        if key in self.hash_map:
+            oldNode = self.hash_map[key]
+            self._remove(oldNode)
+            self.quota += 1
+        
+        if self.quota < 0:
+            lastNode = self.tail.pre
+            self._remove(lastNode)
+            del self.hash_map[lastNode.key]
+            self.quota += 1
+
+        self._add(newNode)
+        self.quota -= 1
+        self.hash_map[key] = newNode
+    
+    def _remove(self, node):
+        preNode = node.pre
+        nextNode = node.next
+        preNode.next = nextNode
+        nextNode.pre = preNode
+    
+    def _add(self, node):
+        firstNode = self.head.next
+        self.head.next = node
+        node.pre = self.head
+
+        node.next = firstNode
+        firstNode.pre = node
+
+        
+
+
+# Your LRUCache object will be instantiated and called as such:
+# obj = LRUCache(capacity)
+# param_1 = obj.get(key)
+# obj.put(key,value)
+
+
+
+
+# Your LRUCache object will be instantiated and called as such:
+# obj = LRUCache(capacity
+# param_1 = obj.get(key)
+# obj.put(key,value)
+
+# Definition for a binary tree node.
+class TreeNode:
+    def __init__(self, val=0, left=None, right=None):
+        self.val = val
+        self.left = left
+        self.right = right
+
+class Solution1110:
+    def delNodes(self, root: Optional[TreeNode], to_delete: List[int]) -> List[TreeNode]:
+        to_delete = set(to_delete)
+        res = []
+        def helper(node: TreeNode, isPaEx):
+            if node is None:
+                return None
+            if node in to_delete:
+                node.left = helper(node.left, false)
+                node.right = helper(node.right, false)
+                return None
+            else:
+                if isPaEx == False:
+                    res.append(node)
+                node.left = helper(node.left, true)
+                node.right = helper(node.right, true)
+                return node
+        helper(root, false)
+        return res
+    
+class BSTIterator:
+
+    def __init__(self, root: Optional[TreeNode]):
+        self.st = []
+        self.push_all(root)
+
+    def next(self) -> int:
+        out_node = self.st.pop()
+        self.push_all(out_node.right)
+        return out_node.val
+
+    def hasNext(self) -> bool:
+        return len(self.st) == 0
+
+    def push_all(self, node: TreeNode):
+        while node is not None:
+            self.st.append(node)
+            node = node.left
